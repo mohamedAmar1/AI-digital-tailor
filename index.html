@@ -2,64 +2,226 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>نظام قياس الجسم الذكي - فحص الكارت الديناميكي</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Digital Tailor - الخياط الرقمي الذكي</title>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script async src="https://docs.opencv.org/4.5.4/opencv.js" type="text/javascript"></script>
   
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #f4f6f9; margin: 0; padding: 20px; }
-    .container { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+    :root {
+      --primary: #3b82f6;
+      --primary-hover: #1d4ed8;
+      --success: #10b981;
+      --error: #dc3545;
+      --bg-glass: rgba(15, 23, 42, 0.7);
+    }
+
+    * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, sans-serif; margin: 0; padding: 0; }
+
+    body { 
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #0f172a; 
+      color: #f8fafc;
+      overflow-x: hidden;
+      padding-bottom: 80px; 
+    }
+
+    #bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    h1 {
+      margin: 30px 10px 10px 10px;
+      font-size: calc(1.8rem + 1vw); 
+      font-weight: 800;
+      text-align: center;
+      background: linear-gradient(to left, #38bdf8, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .container { 
+      width: 100%;
+      max-width: 1200px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      z-index: 1;
+    }
     
-    .choice-panel { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 550px; margin-bottom: 15px; }
-    .choice-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #1a365d; }
-    .btn-group { display: flex; gap: 15px; justify-content: center; }
-    .btn-choice { padding: 15px 20px; font-size: 15px; font-weight: bold; border: 2px solid #007bff; border-radius: 8px; background: white; color: #007bff; cursor: pointer; transition: 0.3s; flex: 1; }
-    .btn-choice:hover { background: #007bff; color: white; }
+    .glass-card {
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 30px 20px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      width: 100%;
+      max-width: 550px;
+    }
+
+    .choice-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 25px; color: #cbd5e1; text-align: center; }
+    .btn-group { display: flex; gap: 15px; justify-content: center; width: 100%; flex-wrap: wrap; }
     
-    .setup-sub-panel { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 15px; display: none; border: 1px dashed #007bff; }
-    .setup-sub-panel input { width: 100px; padding: 8px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; text-align: center; margin: 0 10px; }
-    .btn-start { background: #28a745; color: white; border: none; padding: 8px 25px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+    .btn-choice { 
+      padding: 15px; 
+      font-size: 0.95rem; 
+      font-weight: 700; 
+      border: 1px solid rgba(59, 130, 246, 0.5); 
+      border-radius: 12px; 
+      background: rgba(59, 130, 246, 0.1); 
+      color: #38bdf8; 
+      cursor: pointer; 
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+      flex: 1;
+      min-width: 200px; 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-choice:hover { background: var(--primary); color: white; transform: translateY(-2px); }
     
-    #video-container { position: relative; display: none; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
-    canvas { position: absolute; left: 0; top: 0; transform: scaleX(-1); }
-    video { transform: scaleX(-1); background: #222; }
+    .setup-sub-panel { 
+      background: rgba(255, 255, 255, 0.03); 
+      padding: 20px; 
+      border-radius: 12px; 
+      margin-top: 20px; 
+      border: 1px dashed rgba(59, 130, 246, 0.3); 
+      display: none;
+      text-align: center;
+    }
+
+    /* ستايل خانات الإدخال الجديدة */
+    .setup-sub-panel input[type="text"],
+    .setup-sub-panel input[type="number"] { 
+      width: 100%;
+      max-width: 280px; 
+      padding: 12px; 
+      font-size: 16px; 
+      font-weight: bold;
+      border-radius: 8px; 
+      border: 2px solid #475569; 
+      background: #1e293b;
+      color: #38bdf8;
+      text-align: center; 
+      margin: 10px auto; 
+      outline: none;
+      display: block;
+    }
+    .setup-sub-panel input:focus { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.5); }
+
+    .btn-start { 
+      background: var(--success); 
+      color: white; 
+      border: none; 
+      padding: 12px 30px; 
+      font-size: 1rem; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-weight: 700; 
+      margin-top: 10px;
+      width: 100%;
+      max-width: 250px;
+    }
     
-    .status-badge { padding: 10px 20px; font-size: 18px; font-weight: bold; border-radius: 30px; margin-bottom: 10px; display: none; }
-    .status-error { background-color: #ffe3e3; color: #dc3545; border: 1px solid #dc3545; }
-    .status-success { background-color: #d4edda; color: #28a745; border: 1px solid #28a745; }
+    #video-container { 
+      position: relative; 
+      display: none; 
+      border-radius: 16px; 
+      overflow: hidden; 
+      border: 2px solid rgba(255,255,255,0.1);
+      width: 100%;
+      max-width: 640px; 
+    }
+    video { transform: scaleX(-1); background: #020617; display: block; width: 100%; height: auto; }
+    canvas { position: absolute; left: 0; top: 0; transform: scaleX(-1); width: 100%; height: 100%; }
     
-    .results-panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; max-width: 400px; display: none; }
-    .metric { display: flex; justify-content: space-between; font-size: 18px; margin: 10px 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-    .progress-bar { width: 100%; background-color: #ddd; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 5px; }
-    #progress-fill { width: 0%; height: 100%; background-color: #28a745; transition: width 0.1s; }
+    .status-badge { 
+      padding: 12px 20px; 
+      font-size: 0.95rem; 
+      font-weight: 700; 
+      border-radius: 50px; 
+      text-align: center;
+      max-width: 90%;
+      display: none; 
+    }
+    .status-error { background-color: rgba(220, 53, 69, 0.2); color: #fca5a5; border: 1px solid var(--error); }
+    .status-success { background-color: rgba(16, 185, 129, 0.2); color: #a7f3d0; border: 1px solid var(--success); }
     
-    .auto-save-badge { background-color: #e2f0d9; color: #38a169; font-size: 14px; font-weight: bold; padding: 5px 10px; border-radius: 4px; margin-top: 10px; display: inline-block; }
+    .results-panel { 
+      background: rgba(15, 23, 42, 0.85); 
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 25px; 
+      border-radius: 16px; 
+      width: 100%; 
+      max-width: 450px; 
+      display: none; 
+    }
+    .results-panel h3 { margin-top: 0; color: #f1f5f9; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; text-align: center; }
+    .metric { display: flex; justify-content: space-between; font-size: 1.05rem; margin: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; color: #cbd5e1; }
+    
+    .round-badge { background-color: #3b82f6; color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; }
+    .progress-bar { width: 100%; background-color: #334155; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 10px; }
+    #progress-fill { width: 0%; height: 100%; background-color: var(--success); transition: width 0.1s; }
+    .auto-save-badge { background-color: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.85rem; font-weight: 600; padding: 6px 12px; border-radius: 6px; margin-top: 12px; display: block; text-align: center; }
+    
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+    .footer-text { font-size: 1rem; font-weight: 700; color: #34d399; text-shadow: 0 0 10px rgba(52, 211, 153, 0.3); }
   </style>
 </head>
 <body>
 
-  <h2>الخياط الرقمي الذكي AI - فحص الكارت المتقدم (OpenCV)</h2>
+  <canvas id="bg-animation"></canvas>
+
+  <h1>AI Digital Tailor</h1>
   
   <div class="container">
-    <div class="choice-panel" id="main-choice-panel">
+    <div class="glass-card" id="main-choice-panel">
       <div class="choice-title">برجاء اختيار طريقة معايرة المسافات لبدء المشروع:</div>
       <div class="btn-group">
-        <button class="btn-choice" onclick="selectMode('card')">الحل الأول: فحص بطاقة الرقم القومي<br><small>(أعلى دقة - فحص عبر OpenCV)</small></button>
-        <button class="btn-choice" onclick="selectMode('height')">الحل الثاني: الارتفاع الثابت<br><small>(الأسهل للمستخدم - عبر إدخال طولك)</small></button>
+        <button class="btn-choice" onclick="selectMode('card')">الحل الأول: بطاقة الرقم القومي<small>أعلى دقة - فحص عبر OpenCV</small></button>
+        <button class="btn-choice" onclick="selectMode('height')">الحل الثاني: الارتفاع الثابت<small>الأسهل - عبر إدخال طولك</small></button>
       </div>
 
       <div id="panel-card-info" class="setup-sub-panel">
-        <p style="margin: 0 0 10px 0; font-size: 14px; color: #555;">تعليمات: ضع الكارت أمام صدرك مباشرة بشكل مستقيم ومواجه تماماً للكاميرا ليقوم النظام بفحصه تلقائياً بالبكسل.</p>
-        <button class="btn-start" onclick="startSystem('card')">ابدأ تشغيل الكاميرا</button>
+        <input type="text" id="user-name-card" placeholder="أدخل اسم العميل / المستخدم">
+        <p style="margin: 10px 0; color: #94a3b8; font-size: 0.9rem;">تعليمات: ضع الكارت أمام صدرك مباشرة بشكل مستقيم ومواجه تماماً للكاميرا عند بدء الفحص اللحظي.</p>
+        <button class="btn-start" onclick="startSystem('card')">فتح كاميرا المعايرة</button>
       </div>
 
       <div id="panel-height-info" class="setup-sub-panel">
-        <label for="user-height">أدخل طولك الحقيقي بالـ (سنتيمتر):</label>
-        <input type="number" id="user-height" placeholder="مثال: 175" min="100" max="250">
-        <br>
-        <button class="btn-start" onclick="startSystem('height')">تأكيد وابدأ الكاميرا</button>
+        <input type="text" id="user-name-height" placeholder="أدخل اسم العميل / المستخدم">
+        <input type="number" id="user-height" placeholder="أدخل الطول الحقيقي (سنتيمتر)">
+        <button class="btn-start" onclick="startSystem('height')">تأكيد وتشغيل الكاميرا</button>
       </div>
     </div>
 
@@ -72,43 +234,92 @@
 
     <div class="results-panel" id="results-panel">
       <h3>المقاسات المستخرجة:</h3>
-      <div class="metric"><span>نظام المعايرة المستخدم:</span> <span id="lbl-mode-type" style="font-weight: bold; color: #28a745;">--</span></div>
-      <div class="metric"><span>عرض الكارت المرصود:</span> <span id="lbl-card-status" style="font-weight: bold; color: #ffc107;">جاري الفحص...</span></div>
-      <div class="metric"><span>عرض الكتف المستنتج:</span> <span id="lbl-shoulder" style="color:#007bff; font-weight:bold;">--</span></div>
-      <div class="metric"><span>طول الذراع (الكم):</span> <span id="lbl-arm" style="color:#007bff; font-weight:bold;">--</span></div>
+      <div class="metric"><span>اسم العميل الحالي:</span> <span id="lbl-user-name" style="font-weight: 700; color: #38bdf8;">--</span></div>
+      <div class="metric"><span>نظام المعايرة:</span> <span id="lbl-mode-type" style="font-weight: 700; color: #10b981;">--</span></div>
+      <div class="metric" id="lbl-round-row"><span>الجولة الحالية للقياس:</span> <span id="lbl-round-num" class="round-badge">1 / 3</span></div>
+      <div class="metric" id="card-metric-row"><span>عرض الكارت المرصود:</span> <span id="lbl-card-status" style="font-weight: 700; color: #f59e0b;">جاري الفحص...</span></div>
+      <div class="metric"><span>عرض الكتف الكلي:</span> <span id="lbl-shoulder" style="color:#38bdf8; font-weight:700;">--</span></div>
+      <div class="metric"><span>طول الذراع (الكم):</span> <span id="lbl-arm" style="color:#38bdf8; font-weight:700;">--</span></div>
       
       <div id="sampling-container">
-        <p style="margin:5px 0; font-size:14px; color:#555;">جاري تحليل وتثبيت الأبعاد بدقة...</p>
+        <p id="lbl-sampling-text" style="margin:5px 0; font-size:0.9rem; color:#94a3b8; text-align: center;">جاري تحليل وتثبيت أبعاد الجولة الأولى...</p>
         <div class="progress-bar"><div id="progress-fill"></div></div>
-        <div class="auto-save-badge">⚙️ سيتم حفظ ملف الـ PDF تلقائياً فور اكتمال الشريط</div>
+        <div class="auto-save-badge">⚙️ يرجى الثبات؛ سيتم أخذ 3 جولات متتالية والحفظ تلقائياً</div>
       </div>
     </div>
   </div>
 
+  <footer>
+    <div class="footer-text">Powered by Eng Mohamed Ammar</div>
+  </footer>
+
   <script>
-    let selectedMode = ""; 
-    let userRealHeightCm = 0;
-    const REAL_CARD_WIDTH_CM = 8.56; 
+    // خوارزمية الخلفية المتحركة
+    const bgCanvas = document.getElementById('bg-animation'); const bgCtx = bgCanvas.getContext('2d'); let particles = [];
+    function resizeBg() { bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeBg); resizeBg();
 
-    const videoElement = document.getElementById('webcam');
-    const canvasElement = document.getElementById('output_canvas');
-    const canvasCtx = canvasElement.getContext('2d');
-    
-    const statusDiv = document.getElementById('status');
-    const lblShoulder = document.getElementById('lbl-shoulder');
-    const lblArm = document.getElementById('lbl-arm');
-    const lblCardStatus = document.getElementById('lbl-card-status');
-    const lblModeType = document.getElementById('lbl-mode-type');
-    const progressFill = document.getElementById('progress-fill');
-    const samplingContainer = document.getElementById('sampling-container');
+    class Particle {
+      constructor() {
+        this.x = Math.random() * bgCanvas.width; this.y = Math.random() * bgCanvas.height;
+        this.vx = (Math.random() - 0.5) * 0.6; this.vy = (Math.random() - 0.5) * 0.6; this.radius = Math.random() * 2 + 1;
+      }
+      update() {
+        this.x += this.vx; this.y += this.vy;
+        if (this.x < 0 || this.x > bgCanvas.width) this.vx *= -1; if (this.y < 0 || this.y > bgCanvas.height) this.vy *= -1;
+      }
+      draw() { bgCtx.beginPath(); bgCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); bgCtx.fillStyle = 'rgba(56, 189, 248, 0.25)'; bgCtx.fill(); }
+    }
+    for (let i = 0; i < 70; i++) particles.push(new Particle());
+    function animateBg() {
+      bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update(); particles[i].draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          let dx = particles[i].x - particles[j].x; let dy = particles[i].y - particles[j].y; let dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 110) {
+            bgCtx.beginPath(); bgCtx.moveTo(particles[i].x, particles[i].y); bgCtx.lineTo(particles[j].x, particles[j].y);
+            bgCtx.strokeStyle = `rgba(59, 130, 246, ${0.15 * (1 - dist/110)})`; bgCtx.lineWidth = 0.8; bgCtx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animateBg);
+    }
+    animateBg();
 
-    let shoulderSamples = [];
-    let armSamples = [];
-    const REQUIRED_SAMPLES = 40; 
-    let finalShoulder = 0;
-    let finalArm = 0;
-    let cameraStarted = false;
-    let isSaved = false; 
+    function playAudioFeedback(type) {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (type === 'round') {
+          const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+          osc.type = 'triangle'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+          gain.gain.setValueAtTime(0.08, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+          osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+        } else if (type === 'final') {
+          const osc1 = audioCtx.createOscillator(); const gain1 = audioCtx.createGain();
+          osc1.type = 'sine'; osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+          gain1.gain.setValueAtTime(0.12, audioCtx.currentTime); gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+          osc1.connect(gain1); gain1.connect(audioCtx.destination); osc1.start(); osc1.stop(audioCtx.currentTime + 0.4);
+          setTimeout(() => {
+            const osc2 = audioCtx.createOscillator(); const gain2 = audioCtx.createGain();
+            osc2.type = 'sine'; osc2.frequency.setValueAtTime(659.25, audioCtx.currentTime); 
+            gain2.gain.setValueAtTime(0.18, audioCtx.currentTime); gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+            osc2.connect(gain2); gain2.connect(audioCtx.destination); osc2.start(); osc2.stop(audioCtx.currentTime + 0.6);
+          }, 120);
+        }
+      } catch (e) {}
+    }
+
+    let selectedMode = ""; let userRealHeightCm = 0; let finalUserName = "Guest User"; const REAL_CARD_WIDTH_CM = 8.56; 
+    const videoElement = document.getElementById('webcam'); const canvasElement = document.getElementById('output_canvas'); const canvasCtx = canvasElement.getContext('2d');
+    const statusDiv = document.getElementById('status'); const lblShoulder = document.getElementById('lbl-shoulder'); const lblArm = document.getElementById('lbl-arm');
+    const lblCardStatus = document.getElementById('lbl-card-status'); const lblModeType = document.getElementById('lbl-mode-type'); const lblUserName = document.getElementById('lbl-user-name');
+    const lblRoundNum = document.getElementById('lbl-round-num'); const lblSamplingText = document.getElementById('lbl-sampling-text');
+    const progressFill = document.getElementById('progress-fill'); const samplingContainer = document.getElementById('sampling-container');
+
+    let currentRound = 1; let currentRoundSamplesShoulder = []; let currentRoundSamplesArm = []; const SAMPLES_PER_ROUND = 30; 
+    let round1ShoulderAvg = 0, round2ShoulderAvg = 0, round3ShoulderAvg = 0; let round1ArmAvg = 0, round2ArmAvg = 0, round3ArmAvg = 0;
+    let finalShoulder = 0; let finalArm = 0; let cameraStarted = false; let isSaved = false; 
 
     function selectMode(mode) {
       selectedMode = mode;
@@ -118,243 +329,152 @@
 
     function startSystem(mode) {
       if (mode === 'height') {
+        const nameInput = document.getElementById('user-name-height').value.trim();
         const heightInput = document.getElementById('user-height').value;
-        if (!heightInput || heightInput < 100 || heightInput > 250) {
-          alert("برجاء إدخال طول صحيح بالسنتيمتر");
-          return;
-        }
+        if (!heightInput || heightInput < 100 || heightInput > 250) { alert("برجاء إدخال طول صحيح بالسنتيمتر"); return; }
+        if (nameInput) finalUserName = nameInput;
         userRealHeightCm = parseFloat(heightInput);
         lblModeType.innerText = "الارتفاع المرجعي (" + userRealHeightCm + " سم)";
-        lblCardStatus.parentElement.style.display = "none";
+        document.getElementById('card-metric-row').style.display = "none";
       } else {
-        lblModeType.innerText = "فحص كارت OpenCV المتقدم";
-        lblCardStatus.parentElement.style.display = "flex";
+        const nameInput = document.getElementById('user-name-card').value.trim();
+        if (nameInput) finalUserName = nameInput;
+        lblModeType.innerText = "فحص كارت OpenCV"; document.getElementById('card-metric-row').style.display = "flex";
       }
       
-      document.getElementById('main-choice-panel').style.display = "none";
-      document.getElementById('video-container').style.display = "inline-block";
-      document.getElementById('results-panel').style.display = "block";
-      statusDiv.style.display = "inline-block";
-      
-      if(!cameraStarted) {
-        camera.start();
-        cameraStarted = true;
-      }
+      lblUserName.innerText = finalUserName;
+      document.getElementById('main-choice-panel').style.display = "none"; document.getElementById('video-container').style.display = "inline-block";
+      document.getElementById('results-panel').style.display = "block"; statusDiv.style.display = "inline-block";
+      if(!cameraStarted) { camera.start(); cameraStarted = true; }
     }
 
-    function calculateDistance(p1, p2) {
-        let dx = (p1.x - p2.x) * 640;
-        let dy = (p1.y - p2.y) * 480;
-        return Math.sqrt(dx * dx + dy * dy);
-    }
+    function calculateDistance(p1, p2) { return Math.sqrt(Math.pow((p1.x - p2.x)*640, 2) + Math.pow((p1.y - p2.y)*480, 2)); }
 
     function detectCardWidthPixels() {
       try {
-        let src = cv.imread(canvasElement);
-        let dst = new cv.Mat();
-        let gray = new cv.Mat();
-        let edges = new cv.Mat();
-        
-        cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
-        let ksize = new cv.Size(5, 5);
-        cv.GaussianBlur(gray, gray, ksize, 0, 0, cv.BORDER_DEFAULT);
-        
-        cv.Canny(gray, edges, 75, 200, 3, false);
-        
-        let contours = new cv.MatVector(); // تم تصحيح السطر هنا بنجاح
-        let hierarchy = new cv.Mat();
-        cv.findContours(edges, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-        
+        let src = cv.imread(canvasElement); let gray = new cv.Mat(); let edges = new cv.Mat();
+        cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0); cv.GaussianBlur(gray, gray, new cv.Size(5, 5), 0, 0, cv.BORDER_DEFAULT); cv.Canny(gray, edges, 75, 200, 3, false);
+        let contours = new cv.MatVector(); let hierarchy = new cv.Mat(); cv.findContours(edges, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
         let detectedWidth = 0;
-        
         for (let i = 0; i < contours.size(); ++i) {
-            let cnt = contours.get(i);
-            let rect = cv.boundingRect(cnt);
-            let aspectRatio = rect.width / rect.height;
-            
+            let cnt = contours.get(i); let rect = cv.boundingRect(cnt); let aspectRatio = rect.width / rect.height;
             if (rect.width > 35 && rect.width < 150 && aspectRatio > 1.3 && aspectRatio < 1.8) {
-                detectedWidth = rect.width;
-                
-                canvasCtx.strokeStyle = "#ffc107";
-                canvasCtx.lineWidth = 3;
-                canvasCtx.strokeRect(640 - rect.x - rect.width, rect.y, rect.width, rect.height);
-                break;
+                detectedWidth = rect.width; canvasCtx.strokeStyle = "#f59e0b"; canvasCtx.lineWidth = 3; canvasCtx.strokeRect(640 - rect.x - rect.width, rect.y, rect.width, rect.height); break;
             }
         }
-        
-        src.delete(); dst.delete(); gray.delete(); edges.delete(); contours.delete(); hierarchy.delete();
-        
-        return detectedWidth;
-      } catch (err) {
-        return 0; 
-      }
+        src.delete(); gray.delete(); edges.delete(); contours.delete(); hierarchy.delete(); return detectedWidth;
+      } catch (err) { return 0; }
     }
 
     function onResults(results) {
-      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-      
-      if (!results.poseLandmarks) {
-        updateStatus("لم يتم اكتشاف شخص أمام الكاميرا", "error");
-        return;
-      }
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height); canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+      if (!results.poseLandmarks) { updateStatus("لم يتم اكتشاف شخص أمام الكاميرا", "error"); return; }
 
       const landmarks = results.poseLandmarks;
-      const nose = landmarks[0];
-      const leftAnkle = landmarks[27];
-      const rightAnkle = landmarks[28];
-      const leftShoulder = landmarks[11];
-      const rightShoulder = landmarks[12];
-      const leftElbow = landmarks[13];
-      const leftWrist = landmarks[15];
+      const nose = landmarks[0]; const leftAnkle = landmarks[27]; const rightAnkle = landmarks[28];
+      const leftShoulder = landmarks[11]; const rightShoulder = landmarks[12]; const leftElbow = landmarks[13]; const leftWrist = landmarks[15];
 
       const isBodyVisible = (nose.visibility > 0.75 && leftAnkle.visibility > 0.75 && rightAnkle.visibility > 0.75);
-      
-      if (!isBodyVisible) {
-        updateStatus("خطأ: يرجى التراجع للخلف لتظهر قدميك ورأسك بالكامل", "error");
-        resetSampling();
-        return;
-      }
+      if (!isBodyVisible) { updateStatus("خطأ: يرجى التراجع للخلف لتظهر قدميك ورأسك بالكامل", "error"); resetSampling(); return; }
 
       let dynamicPixelToCmRatio = 0.264; 
 
       if (selectedMode === 'height') {
-        let ankleX = (leftAnkle.x + rightAnkle.x) / 2;
-        let ankleY = (leftAnkle.y + rightAnkle.y) / 2;
-        let heightInPixels = calculateDistance(nose, {x: ankleX, y: ankleY});
-        let adjustedHeightPixels = heightInPixels * 1.065; 
+        let ankleX = (leftAnkle.x + rightAnkle.x) / 2; let ankleY = (leftAnkle.y + rightAnkle.y) / 2;
+        let heightInPixels = calculateDistance(nose, {x: ankleX, y: ankleY}); let adjustedHeightPixels = heightInPixels * 1.065; 
         dynamicPixelToCmRatio = userRealHeightCm / adjustedHeightPixels;
       } else if (selectedMode === 'card') {
         let cardWidthPixels = detectCardWidthPixels();
-        
         if (cardWidthPixels === 0) {
           updateStatus("برجاء إظهار بطاقة الرقم القومي بوضوح أمام الصدر لفحصها", "error");
-          lblCardStatus.innerText = "لم يتم الرصد";
-          lblCardStatus.style.color = "#dc3545";
-          resetSampling();
-          return;
+          lblCardStatus.innerText = "لم يتم الرصد"; lblCardStatus.style.color = "#dc3545"; resetSampling(); return;
         } else {
-          lblCardStatus.innerText = cardWidthPixels + " بكسل (تم الرصد)";
-          lblCardStatus.style.color = "#28a745";
-          dynamicPixelToCmRatio = REAL_CARD_WIDTH_CM / cardWidthPixels;
+          lblCardStatus.innerText = cardWidthPixels + " بكسل"; lblCardStatus.style.color = "#10b981"; dynamicPixelToCmRatio = REAL_CARD_WIDTH_CM / cardWidthPixels;
         }
       }
 
-      updateStatus("وضعية صحيحة وتم فحص المعايرة! ثبت حركتك تماماً", "success");
+      updateStatus(`وضعية صحيحة! جاري معالجة الجولة [${currentRound}]...`, "success");
 
-      let shoulderPixels = calculateDistance(rightShoulder, leftShoulder);
-      let currentShoulderCm = shoulderPixels * dynamicPixelToCmRatio;
+      let shoulderPixels = calculateDistance(rightShoulder, leftShoulder); let currentShoulderCm = shoulderPixels * dynamicPixelToCmRatio;
+      let armPixels = calculateDistance(leftShoulder, leftElbow) + calculateDistance(leftElbow, leftWrist); let currentArmCm = armPixels * dynamicPixelToCmRatio;
 
-      let armPixels = calculateDistance(leftShoulder, leftElbow) + calculateDistance(leftElbow, leftWrist);
-      let currentArmCm = armPixels * dynamicPixelToCmRatio;
+      if (currentRound <= 3 && finalShoulder === 0) {
+        if (currentRoundSamplesShoulder.length < SAMPLES_PER_ROUND) {
+          currentRoundSamplesShoulder.push(currentShoulderCm); currentRoundSamplesArm.push(currentArmCm);
+          let progress = (currentRoundSamplesShoulder.length / SAMPLES_PER_ROUND) * 100; progressFill.style.width = progress + "%";
+        } else {
+          let shoulderSum = currentRoundSamplesShoulder.reduce((a, b) => a + b, 0) / SAMPLES_PER_ROUND;
+          let armSum = currentRoundSamplesArm.reduce((a, b) => a + b, 0) / SAMPLES_PER_ROUND;
 
-      if (shoulderSamples.length < REQUIRED_SAMPLES) {
-        shoulderSamples.push(currentShoulderCm);
-        armSamples.push(currentArmCm);
-        
-        let progress = (shoulderSamples.length / REQUIRED_SAMPLES) * 100;
-        progressFill.style.width = progress + "%";
-      } else {
-        if (finalShoulder === 0) {
-            finalShoulder = (shoulderSamples.reduce((a, b) => a + b, 0) / REQUIRED_SAMPLES).toFixed(1);
-            finalArm = (armSamples.reduce((a, b) => a + b, 0) / REQUIRED_SAMPLES).toFixed(1);
+          if (currentRound === 1) {
+            round1ShoulderAvg = shoulderSum; round1ArmAvg = armSum; currentRound = 2; lblRoundNum.innerText = "2 / 3";
+            playAudioFeedback('round'); lblSamplingText.innerText = "رائع! يرجى الثبات؛ جاري فحص الجولة الثانية...";
+          } else if (currentRound === 2) {
+            round2ShoulderAvg = shoulderSum; round2ArmAvg = armSum; currentRound = 3; lblRoundNum.innerText = "3 / 3";
+            playAudioFeedback('round'); lblSamplingText.innerText = "جولة أخيرة! اثبت لحظة واحدة لإنهاء الدمج الحسابي...";
+          } else if (currentRound === 3) {
+            round3ShoulderAvg = shoulderSum; round3ArmAvg = armSum; currentRound = 4; 
+            finalShoulder = ((round1ShoulderAvg + round2ShoulderAvg + round3ShoulderAvg) / 3).toFixed(1);
+            finalArm = ((round1ArmAvg + round2ArmAvg + round3ArmAvg) / 3).toFixed(1);
             
-            lblShoulder.innerText = finalShoulder + " سم";
-            lblArm.innerText = finalArm + " سم";
-            updateStatus("تم القياس بنجاح جاري التحميل التلقائي...", "success");
+            lblShoulder.innerText = finalShoulder + " سم"; lblArm.innerText = finalArm + " سم";
+            samplingContainer.style.display = "none"; updateStatus("تم دمج الجولات وحفظ الأبعاد بنجاح تام!", "success");
             
             if (!isSaved) {
-              isSaved = true;
-              setTimeout(generatePDF, 800); 
+              isSaved = true; playAudioFeedback('final'); setTimeout(generatePDF, 800); 
             }
+          }
+          currentRoundSamplesShoulder = []; currentRoundSamplesArm = [];
         }
       }
-
       drawMeasurementLines(canvasCtx, leftShoulder, rightShoulder, leftElbow, leftWrist);
     }
 
-    function updateStatus(text, type) {
-      statusDiv.innerText = text;
-      statusDiv.className = `status-badge status-${type}`;
-    }
-
+    function updateStatus(text, type) { statusDiv.innerText = text; statusDiv.className = `status-badge status-${type}`; }
     function resetSampling() {
-      shoulderSamples = [];
-      armSamples = [];
-      finalShoulder = 0;
-      finalArm = 0;
-      isSaved = false;
-      lblShoulder.innerText = "--";
-      lblArm.innerText = "--";
-      progressFill.style.width = "0%";
+      currentRound = 1; currentRoundSamplesShoulder = []; currentRoundSamplesArm = [];
+      round1ShoulderAvg = 0; round2ShoulderAvg = 0; round3ShoulderAvg = 0; round1ArmAvg = 0; round2ArmAvg = 0; round3ArmAvg = 0;
+      finalShoulder = 0; finalArm = 0; isSaved = false; lblShoulder.innerText = "--"; lblArm.innerText = "--"; lblRoundNum.innerText = "1 / 3";
+      lblSamplingText.innerText = "جاري تحليل وتثبيت أبعاد الجولة الأولى..."; progressFill.style.width = "0%"; samplingContainer.style.display = "block";
     }
 
     function drawMeasurementLines(ctx, ls, rs, le, lw) {
-      ctx.strokeStyle = "#28a745"; 
-      ctx.lineWidth = 4;
-      ctx.beginPath(); ctx.moveTo(ls.x * 640, ls.y * 480); ctx.lineTo(rs.x * 640, rs.y * 480); ctx.stroke();
-      
-      ctx.strokeStyle = "#ffc107"; 
-      ctx.beginPath(); ctx.moveTo(ls.x * 640, ls.y * 480); ctx.lineTo(le.x * 640, le.y * 480); ctx.lineTo(lw.x * 640, lw.y * 480); ctx.stroke();
+      ctx.strokeStyle = "#10b981"; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(ls.x * 640, ls.y * 480); ctx.lineTo(rs.x * 640, rs.y * 480); ctx.stroke();
+      ctx.strokeStyle = "#f59e0b"; ctx.beginPath(); ctx.moveTo(ls.x * 640, ls.y * 480); ctx.lineTo(le.x * 640, le.y * 480); ctx.lineTo(lw.x * 640, lw.y * 480); ctx.stroke();
     }
 
     const pose = new Pose({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}` });
     pose.setOptions({ modelComplexity: 1, smoothLandmarks: true, minDetectionConfidence: 0.75, minTrackingConfidence: 0.75 });
     pose.onResults(onResults);
+    const camera = new Camera(videoElement, { onFrame: async () => { await pose.send({image: videoElement}); }, width: 640, height: 480 });
 
-    const camera = new Camera(videoElement, {
-      onFrame: async () => { await pose.send({image: videoElement}); },
-      width: 640, height: 480
-    });
-
+    // تعديل دالة الـ PDF لطباعة اسم المستخدم المدخل بشكل رسمي
     function generatePDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      
-      const now = new Date();
+      const { jsPDF } = window.jspdf; const doc = new jsPDF(); const now = new Date();
       const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
       const formattedDate = now.toLocaleDateString('en-US', options);
       
-      doc.setFont("Helvetica", "bold");
-      doc.setFontSize(22);
-      doc.setTextColor(0, 123, 255); 
-      doc.text("AI Tailor - Accurate Size Report", 20, 25);
+      doc.setFont("Helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(0, 123, 255); doc.text("AI Tailor - Accurate Size Report", 20, 25);
+      doc.setLineWidth(0.8); doc.setDrawColor(0, 123, 255); doc.line(20, 30, 190, 30);
       
-      doc.setLineWidth(0.8);
-      doc.setDrawColor(0, 123, 255);
-      doc.line(20, 30, 190, 30);
-      
-      doc.setFont("Helvetica", "normal");
-      doc.setFontSize(12);
-      doc.setTextColor(50, 50, 50);
-      doc.text(`Report Date: ${formattedDate}`, 20, 42);
+      doc.setFont("Helvetica", "normal"); doc.setFontSize(12); doc.setTextColor(50, 50, 50);
+      doc.text(`Customer Name: ${finalUserName}`, 20, 40); // طباعة الاسم هنا
+      doc.text(`Report Date: ${formattedDate}`, 20, 48);
       
       let modeText = (selectedMode === 'height') ? `Reference Height Method (${userRealHeightCm} cm)` : "National ID Card Method (Dynamic OpenCV Scan)";
-      doc.text(`Calibration Method: ${modeText}`, 20, 50);
+      doc.text(`Calibration Method: ${modeText} - 3 Rounds Merged`, 20, 56);
       
-      doc.setFillColor(245, 246, 249);
-      doc.rect(20, 58, 170, 35, 'F');
+      doc.setFillColor(245, 246, 249); doc.rect(20, 64, 170, 35, 'F');
+      doc.setFont("Helvetica", "bold"); doc.setFontSize(14);
+      doc.text(`Calculated Shoulder Width: ${finalShoulder} cm`, 25, 76); doc.text(`Calculated Sleeve Length (Arm): ${finalArm} cm`, 25, 88);
       
-      doc.setFont("Helvetica", "bold");
-      doc.setFontSize(14);
-      doc.text(`Calculated Shoulder Width: ${finalShoulder} cm`, 25, 70);
-      doc.text(`Calculated Sleeve Length (Arm): ${finalArm} cm`, 25, 82);
-      
-      doc.setFont("Helvetica", "italic");
-      doc.setFontSize(10);
-      doc.setTextColor(120);
-      doc.text("This report was generated automatically via OpenCV Card-Detection Scan.", 20, 105);
-      
-      doc.setLineWidth(0.3);
-      doc.setDrawColor(200, 200, 200);
-      doc.line(20, 270, 190, 270); 
-      
-      doc.setFont("Helvetica", "bold");
-      doc.setFontSize(11);
-      doc.setTextColor(40, 167, 69); 
+      doc.setFont("Helvetica", "italic"); doc.setFontSize(10); doc.setTextColor(120);
+      doc.text("This report was generated using a 3-Stage Sampling Verification to maximize accuracy.", 20, 112);
+      doc.setLineWidth(0.3); doc.setDrawColor(200, 200, 200); doc.line(20, 270, 190, 270); 
+      doc.setFont("Helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(40, 167, 69); 
       doc.text("Powered by Eng Mohamed Ammar", 130, 278);
       
-      doc.save(`AI_Tailor_Report_${now.getTime()}.pdf`);
+      doc.save(`AI_Tailor_Report_${finalUserName}_${now.getTime()}.pdf`);
     }
   </script>
 </body>
