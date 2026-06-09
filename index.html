@@ -255,12 +255,15 @@
       <div class="metric"><span>نظام المعايرة:</span> <span id="lbl-mode-type" style="font-weight: 700; color: #10b981;">--</span></div>
       <div class="metric" id="lbl-round-row"><span>الجولة الحالية للقياس:</span> <span id="lbl-round-num" class="round-badge">1 / 3</span></div>
       <div class="metric" id="card-metric-row"><span>عرض الكارت المرصود:</span> <span id="lbl-card-status" style="font-weight: 700; color: #f59e0b;">جاري الفحص...</span></div>
-      <div class="metric"><span>عرض الكتف الكلي:</span> <span id="lbl-shoulder" style="color:#38bdf8; font-weight:700;">--</span></div>
-      <div class="metric"><span>طول الذراع (الكم):</span> <span id="lbl-arm" style="color:#38bdf8; font-weight:700;">--</span></div>
-      <div class="metric"><span>عرض الإسورة (المعصم):</span> <span id="lbl-wrist" style="color:#38bdf8; font-weight:700;">--</span></div>
-      <div class="metric"><span>عرض منطقة البطن:</span> <span id="lbl-belly" style="color:#38bdf8; font-weight:700;">--</span></div>
-      <div class="metric"><span>عرض منطقة الأرداف:</span> <span id="lbl-hips" style="color:#38bdf8; font-weight:700;">--</span></div>
-      <div class="metric"><span>طول الرجل الكلي:</span> <span id="lbl-leg" style="color:#38bdf8; font-weight:700;">--</span></div>
+      
+      <div class="metric"><span>1. عرض الكتف:</span> <span id="lbl-shoulder" style="color:#38bdf8; font-weight:700;">--</span></div>
+      <div class="metric"><span>2. عرض الرقبة:</span> <span id="lbl-neck" style="color:#38bdf8; font-weight:700;">--</span></div>
+      <div class="metric"><span>3. حردة الإبط:</span> <span id="lbl-armhole" style="color:#38bdf8; font-weight:700;">--</span></div>
+      <div class="metric"><span>4. طول الذراع:</span> <span id="lbl-arm" style="color:#38bdf8; font-weight:700;">--</span></div>
+      <div class="metric"><span>5. عرض الصدر:</span> <span id="lbl-chest" style="color:#38bdf8; font-weight:700;">--</span></div>
+      <div class="metric"><span>6. عرض الوسط:</span> <span id="lbl-belly" style="color:#38bdf8; font-weight:700;">--</span></div>
+      <div class="metric"><span>7. عرض أكبر حجم (الأرداف):</span> <span id="lbl-hips" style="color:#38bdf8; font-weight:700;">--</span></div>
+      <div class="metric"><span>8. طول الرجل الكلي:</span> <span id="lbl-leg" style="color:#38bdf8; font-weight:700;">--</span></div>
       
       <div id="sampling-container">
         <p id="lbl-sampling-text" style="margin:5px 0; font-size:0.9rem; color:#94a3b8; text-align: center;">جاري تحليل وتثبيت أبعاد الجولة الأولى...</p>
@@ -333,26 +336,39 @@
     let selectedMode = ""; let userRealHeightCm = 0; let finalUserName = "YARA MAHMOUD"; const REAL_CARD_WIDTH_CM = 8.56; 
     const videoElement = document.getElementById('webcam'); const canvasElement = document.getElementById('output_canvas'); const canvasCtx = canvasElement.getContext('2d');
     const statusDiv = document.getElementById('status'); 
-    const lblShoulder = document.getElementById('lbl-shoulder'); const lblArm = document.getElementById('lbl-arm'); const lblWrist = document.getElementById('lbl-wrist');
-    const lblBelly = document.getElementById('lbl-belly'); const lblHips = document.getElementById('lbl-hips'); const lblLeg = document.getElementById('lbl-leg');
+    
+    const lblShoulder = document.getElementById('lbl-shoulder'); const lblNeck = document.getElementById('lbl-neck');
+    const lblArmhole = document.getElementById('lbl-armhole'); const lblArm = document.getElementById('lbl-arm'); 
+    const lblChest = document.getElementById('lbl-chest'); const lblBelly = document.getElementById('lbl-belly'); 
+    const lblHips = document.getElementById('lbl-hips'); const lblLeg = document.getElementById('lbl-leg');
+    
     const lblCardStatus = document.getElementById('lbl-card-status'); const lblModeType = document.getElementById('lbl-mode-type'); const lblUserName = document.getElementById('lbl-user-name');
     const lblRoundNum = document.getElementById('lbl-round-num'); const lblSamplingText = document.getElementById('lbl-sampling-text');
     const progressFill = document.getElementById('progress-fill'); const samplingContainer = document.getElementById('sampling-container');
 
     let currentRound = 1; 
-    let currentRoundSamplesShoulder = []; let currentRoundSamplesArm = []; let currentRoundSamplesWrist = [];
-    let currentRoundSamplesBelly = []; let currentRoundSamplesHips = []; let currentRoundSamplesLeg = [];
+    let currentRoundSamplesShoulder = []; let currentRoundSamplesNeck = []; let currentRoundSamplesArmhole = [];
+    let currentRoundSamplesArm = []; let currentRoundSamplesChest = []; let currentRoundSamplesBelly = []; 
+    let currentRoundSamplesHips = []; let currentRoundSamplesLeg = [];
     const SAMPLES_PER_ROUND = 30; 
 
     let round1ShoulderAvg = 0, round2ShoulderAvg = 0, round3ShoulderAvg = 0; 
+    let round1NeckAvg = 0, round2NeckAvg = 0, round3NeckAvg = 0;
+    let round1ArmholeAvg = 0, round2ArmholeAvg = 0, round3ArmholeAvg = 0;
     let round1ArmAvg = 0, round2ArmAvg = 0, round3ArmAvg = 0;
-    let round1WristAvg = 0, round2WristAvg = 0, round3WristAvg = 0;
+    let round1ChestAvg = 0, round2ChestAvg = 0, round3ChestAvg = 0;
     let round1BellyAvg = 0, round2BellyAvg = 0, round3BellyAvg = 0;
     let round1HipsAvg = 0, round2HipsAvg = 0, round3HipsAvg = 0;
     let round1LegAvg = 0, round2LegAvg = 0, round3LegAvg = 0;
 
-    let finalShoulder = 0; let finalArm = 0; let finalWrist = 0; let finalBelly = 0; let finalHips = 0; let finalLeg = 0;
+    let finalShoulder = 0; let finalNeck = 0; let finalArmhole = 0; let finalArm = 0; let finalChest = 0; let finalBelly = 0; let finalHips = 0; let finalLeg = 0;
     let cameraStarted = false; let isSaved = false; 
+
+    // متغيرات للتحكم في الأداء وتخفيف الضغط
+    let lastSampleTime = 0;
+    const SAMPLE_DELAY_MS = 100; // فاصل زمني 100 مللي ثانية بين العينات لإعطاء المتصفح فرصة للتنفس ومنع التهنيج
+    let frameCount = 0;
+    let lastDetectedCardWidth = 0;
 
     function selectMode(mode) {
       selectedMode = mode;
@@ -385,6 +401,11 @@
     function calculateDistance(p1, p2) { return Math.sqrt(Math.pow((p1.x - p2.x)*640, 2) + Math.pow((p1.y - p2.y)*480, 2)); }
 
     function detectCardWidthPixels() {
+      frameCount++;
+      // تشغيل معالجة الصور للكارت مرة واحدة كل 5 إطارات فقط لتخفيف الحمل ومنع التهنيج تماماً
+      if (frameCount % 5 !== 0 && lastDetectedCardWidth > 0) {
+        return lastDetectedCardWidth;
+      }
       try {
         let src = cv.imread(canvasElement); let gray = new cv.Mat(); let edges = new cv.Mat();
         cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0); cv.GaussianBlur(gray, gray, new cv.Size(5, 5), 0, 0, cv.BORDER_DEFAULT); cv.Canny(gray, edges, 75, 200, 3, false);
@@ -396,8 +417,10 @@
                 detectedWidth = rect.width; canvasCtx.strokeStyle = "#f59e0b"; canvasCtx.lineWidth = 3; canvasCtx.strokeRect(640 - rect.x - rect.width, rect.y, rect.width, rect.height); break;
             }
         }
-        src.delete(); gray.delete(); edges.delete(); contours.delete(); hierarchy.delete(); return detectedWidth;
-      } catch (err) { return 0; }
+        src.delete(); gray.delete(); edges.delete(); contours.delete(); hierarchy.delete(); 
+        if(detectedWidth > 0) lastDetectedCardWidth = detectedWidth;
+        return detectedWidth;
+      } catch (err) { return lastDetectedCardWidth; }
     }
 
     function onResults(results) {
@@ -410,7 +433,7 @@
       const leftShoulder = landmarks[11]; const rightShoulder = landmarks[12]; 
       const leftElbow = landmarks[13]; const leftWrist = landmarks[15];
       const leftHip = landmarks[23]; const rightHip = landmarks[24];
-      const leftKnee = landmarks[25]; const leftPinky = landmarks[17];
+      const leftKnee = landmarks[25];
 
       const isBodyVisible = (nose.visibility > 0.75 && leftAnkle.visibility > 0.75 && rightAnkle.visibility > 0.75 && leftHip.visibility > 0.75);
       if (!isBodyVisible) { updateStatus("خطأ: يرجى التراجع للخلف لتظهر قدميك ورأسك بالكامل", "error"); resetSampling(); return; }
@@ -435,14 +458,11 @@
 
       let shoulderPixels = calculateDistance(rightShoulder, leftShoulder); 
       let currentShoulderCm = shoulderPixels * dynamicPixelToCmRatio;
-
+      let currentNeckCm = currentShoulderCm * 0.36;
+      let currentArmholeCm = (calculateDistance(leftShoulder, leftElbow) * dynamicPixelToCmRatio) * 0.78;
       let armPixels = calculateDistance(leftShoulder, leftElbow) + calculateDistance(leftElbow, leftWrist); 
       let currentArmCm = armPixels * dynamicPixelToCmRatio;
-
-      // حساب عرض الإسورة (المعصم) هندسياً
-      let wristPixels = calculateDistance(leftWrist, leftPinky);
-      if(wristPixels < 5) wristPixels = shoulderPixels * 0.09; // صمام أمان هندسي في حال تداخل النقاط
-      let currentWristCm = wristPixels * dynamicPixelToCmRatio * 2.3; // معامل تصحيح محيط الإسورة الدائري
+      let currentChestCm = currentShoulderCm * 1.08;
 
       let bellyLeftX = leftShoulder.x + (leftHip.x - leftShoulder.x) * 0.55;
       let bellyLeftY = leftShoulder.y + (leftHip.y - leftShoulder.y) * 0.55;
@@ -453,24 +473,31 @@
 
       let hipsPixels = calculateDistance(rightHip, leftHip);
       let currentHipsCm = hipsPixels * dynamicPixelToCmRatio * 1.22; 
-
       let legPixels = calculateDistance(leftHip, leftKnee) + calculateDistance(leftKnee, leftAnkle);
       let currentLegCm = legPixels * dynamicPixelToCmRatio;
 
       if (finalShoulder === 0) {
         lblShoulder.innerText = currentShoulderCm.toFixed(1) + " سم";
+        lblNeck.innerText = currentNeckCm.toFixed(1) + " سم";
+        lblArmhole.innerText = currentArmholeCm.toFixed(1) + " سم";
         lblArm.innerText = currentArmCm.toFixed(1) + " سم";
-        lblWrist.innerText = currentWristCm.toFixed(1) + " سم";
+        lblChest.innerText = currentChestCm.toFixed(1) + " سم";
         lblBelly.innerText = currentBellyCm.toFixed(1) + " سم";
         lblHips.innerText = currentHipsCm.toFixed(1) + " سم";
         lblLeg.innerText = currentLegCm.toFixed(1) + " سم";
       }
 
-      if (currentRound <= 3 && finalShoulder === 0) {
+      const currentTime = Date.now();
+      // تخفيف معالجة عينات الحفظ لتعمل فقط بعد مرور الوقت المحدد لحل مشكلة تهنيج الكاميرا
+      if (currentRound <= 3 && finalShoulder === 0 && (currentTime - lastSampleTime >= SAMPLE_DELAY_MS)) {
+        lastSampleTime = currentTime; // تحديث توقيت آخر عينة
+
         if (currentRoundSamplesShoulder.length < SAMPLES_PER_ROUND) {
           currentRoundSamplesShoulder.push(currentShoulderCm); 
+          currentRoundSamplesNeck.push(currentNeckCm);
+          currentRoundSamplesArmhole.push(currentArmholeCm);
           currentRoundSamplesArm.push(currentArmCm);
-          currentRoundSamplesWrist.push(currentWristCm);
+          currentRoundSamplesChest.push(currentChestCm);
           currentRoundSamplesBelly.push(currentBellyCm);
           currentRoundSamplesHips.push(currentHipsCm);
           currentRoundSamplesLeg.push(currentLegCm);
@@ -478,37 +505,46 @@
           let progress = (currentRoundSamplesShoulder.length / SAMPLES_PER_ROUND) * 100; progressFill.style.width = progress + "%";
         } else {
           let shoulderSum = currentRoundSamplesShoulder.reduce((a, b) => a + b, 0) / SAMPLES_PER_ROUND;
+          let neckSum = currentRoundSamplesNeck.reduce((a, b) => a + b, 0) / SAMPLES_PER_ROUND;
+          let armholeSum = currentRoundSamplesArmhole.reduce((a, b) => a + b, 0) / SAMPLES_PER_ROUND;
           let armSum = currentRoundSamplesArm.reduce((a, b) => a + b, 0) / SAMPLES_PER_ROUND;
-          let wristSum = currentRoundSamplesWrist.reduce((a, b) => a + b, 0) / SAMPLES_PER_ROUND;
+          let chestSum = currentRoundSamplesChest.reduce((a, b) => a + b, 0) / SAMPLES_PER_ROUND;
           let bellySum = currentRoundSamplesBelly.reduce((a, b) => a + b, 0) / SAMPLES_PER_ROUND;
           let hipsSum = currentRoundSamplesHips.reduce((a, b) => a + b, 0) / SAMPLES_PER_ROUND;
           let legSum = currentRoundSamplesLeg.reduce((a, b) => a + b, 0) / SAMPLES_PER_ROUND;
 
           if (currentRound === 1) {
-            round1ShoulderAvg = shoulderSum; round1ArmAvg = armSum; round1WristAvg = wristSum;
-            round1BellyAvg = bellySum; round1HipsAvg = hipsSum; round1LegAvg = legSum;
+            round1ShoulderAvg = shoulderSum; round1NeckAvg = neckSum; round1ArmholeAvg = armholeSum;
+            round1ArmAvg = armSum; round1ChestAvg = chestSum; round1BellyAvg = bellySum; 
+            round1HipsAvg = hipsSum; round1LegAvg = legSum;
             currentRound = 2; lblRoundNum.innerText = "2 / 3";
             playAudioFeedback('round'); lblSamplingText.innerText = "رائع! يرجى الثبات؛ جاري فحص الجولة الثانية...";
           } else if (currentRound === 2) {
-            round2ShoulderAvg = shoulderSum; round2ArmAvg = armSum; round2WristAvg = wristSum;
-            round2BellyAvg = bellySum; round2HipsAvg = hipsSum; round2LegAvg = legSum;
+            round2ShoulderAvg = shoulderSum; round2NeckAvg = neckSum; round2ArmholeAvg = armholeSum;
+            round2ArmAvg = armSum; round2ChestAvg = chestSum; round2BellyAvg = bellySum; 
+            round2HipsAvg = hipsSum; round2LegAvg = legSum;
             currentRound = 3; lblRoundNum.innerText = "3 / 3";
             playAudioFeedback('round'); lblSamplingText.innerText = "جولة أخيرة! اثبت لحظة واحدة لإنهاء الدمج الحسابي...";
           } else if (currentRound === 3) {
-            round3ShoulderAvg = shoulderSum; round3ArmAvg = armSum; round3WristAvg = wristSum;
-            round3BellyAvg = bellySum; round3HipsAvg = hipsSum; round3LegAvg = legSum;
+            round3ShoulderAvg = shoulderSum; round3NeckAvg = neckSum; round3ArmholeAvg = armholeSum;
+            round3ArmAvg = armSum; round3ChestAvg = chestSum; round3BellyAvg = bellySum; 
+            round3HipsAvg = hipsSum; round3LegAvg = legSum;
             currentRound = 4; 
             
             finalShoulder = ((round1ShoulderAvg + round2ShoulderAvg + round3ShoulderAvg) / 3).toFixed(1);
+            finalNeck = ((round1NeckAvg + round2NeckAvg + round3NeckAvg) / 3).toFixed(1);
+            finalArmhole = ((round1ArmholeAvg + round2ArmholeAvg + round3ArmholeAvg) / 3).toFixed(1);
             finalArm = ((round1ArmAvg + round2ArmAvg + round3ArmAvg) / 3).toFixed(1);
-            finalWrist = ((round1WristAvg + round2WristAvg + round3WristAvg) / 3).toFixed(1);
+            finalChest = ((round1ChestAvg + round2ChestAvg + round3ChestAvg) / 3).toFixed(1);
             finalBelly = ((round1BellyAvg + round2BellyAvg + round3BellyAvg) / 3).toFixed(1);
             finalHips = ((round1HipsAvg + round2HipsAvg + round3HipsAvg) / 3).toFixed(1);
             finalLeg = ((round1LegAvg + round2LegAvg + round3LegAvg) / 3).toFixed(1);
             
             lblShoulder.innerText = finalShoulder + " سم"; 
+            lblNeck.innerText = finalNeck + " سم";
+            lblArmhole.innerText = finalArmhole + " سم";
             lblArm.innerText = finalArm + " سم";
-            lblWrist.innerText = finalWrist + " سم";
+            lblChest.innerText = finalChest + " سم";
             lblBelly.innerText = finalBelly + " سم";
             lblHips.innerText = finalHips + " سم";
             lblLeg.innerText = finalLeg + " سم";
@@ -519,8 +555,9 @@
               isSaved = true; playAudioFeedback('final'); setTimeout(generatePDF, 800); 
             }
           }
-          currentRoundSamplesShoulder = []; currentRoundSamplesArm = []; currentRoundSamplesWrist = [];
-          currentRoundSamplesBelly = []; currentRoundSamplesHips = []; currentRoundSamplesLeg = [];
+          currentRoundSamplesShoulder = []; currentRoundSamplesNeck = []; currentRoundSamplesArmhole = [];
+          currentRoundSamplesArm = []; currentRoundSamplesChest = []; currentRoundSamplesBelly = []; 
+          currentRoundSamplesHips = []; currentRoundSamplesLeg = [];
         }
       }
       drawMeasurementLines(canvasCtx, leftShoulder, rightShoulder, leftElbow, leftWrist, {x: bellyLeftX, y: bellyLeftY}, {x: bellyRightX, y: bellyRightY}, leftHip, rightHip, leftKnee, leftAnkle);
@@ -530,19 +567,25 @@
     
     function resetSampling() {
       currentRound = 1; 
-      currentRoundSamplesShoulder = []; currentRoundSamplesArm = []; currentRoundSamplesWrist = [];
-      currentRoundSamplesBelly = []; currentRoundSamplesHips = []; currentRoundSamplesLeg = [];
+      currentRoundSamplesShoulder = []; currentRoundSamplesNeck = []; currentRoundSamplesArmhole = [];
+      currentRoundSamplesArm = []; currentRoundSamplesChest = []; currentRoundSamplesBelly = []; 
+      currentRoundSamplesHips = []; currentRoundSamplesLeg = [];
+      
       round1ShoulderAvg = 0; round2ShoulderAvg = 0; round3ShoulderAvg = 0; 
+      round1NeckAvg = 0; round2NeckAvg = 0; round3NeckAvg = 0;
+      round1ArmholeAvg = 0; round2ArmholeAvg = 0; round3ArmholeAvg = 0;
       round1ArmAvg = 0; round2ArmAvg = 0; round3ArmAvg = 0;
-      round1WristAvg = 0; round2WristAvg = 0; round3WristAvg = 0;
+      round1ChestAvg = 0; round2ChestAvg = 0; round3ChestAvg = 0;
       round1BellyAvg = 0; round2BellyAvg = 0; round3BellyAvg = 0;
       round1HipsAvg = 0; round2HipsAvg = 0; round3HipsAvg = 0;
       round1LegAvg = 0; round2LegAvg = 0; round3LegAvg = 0;
       
-      finalShoulder = 0; finalArm = 0; finalWrist = 0; finalBelly = 0; finalHips = 0; finalLeg = 0; isSaved = false; 
-      lblShoulder.innerText = "--"; lblArm.innerText = "--"; lblWrist.innerText = "--"; lblBelly.innerText = "--"; lblHips.innerText = "--"; lblLeg.innerText = "--";
+      finalShoulder = 0; finalNeck = 0; finalArmhole = 0; finalArm = 0; finalChest = 0; finalBelly = 0; finalHips = 0; finalLeg = 0; isSaved = false; 
+      lblShoulder.innerText = "--"; lblNeck.innerText = "--"; lblArmhole.innerText = "--"; lblArm.innerText = "--"; 
+      lblChest.innerText = "--"; lblBelly.innerText = "--"; lblHips.innerText = "--"; lblLeg.innerText = "--";
       lblRoundNum.innerText = "1 / 3";
       lblSamplingText.innerText = "جاري تحليل وتثبيت أبعاد الجولة الأولى..."; progressFill.style.width = "0%"; samplingContainer.style.display = "block";
+      lastSampleTime = 0;
     }
 
     function drawMeasurementLines(ctx, ls, rs, le, lw, bl, br, lh, rh, lk, la) {
@@ -558,13 +601,11 @@
     pose.onResults(onResults);
     const camera = new Camera(videoElement, { onFrame: async () => { await pose.send({image: videoElement}); }, width: 640, height: 480 });
 
-function generatePDF() {
+    function generatePDF() {
       const { jsPDF } = window.jspdf; const doc = new jsPDF(); const now = new Date();
-      // إصلاح مشكلة الخطأ في الصورة: استخدام en-US لضمان عدم تشوه الأرقام والرموز والشهور في المكتبة
       const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
       const formattedDate = now.toLocaleDateString('en-US', options);
       
-      // تصميم هيدر التقرير الخلفية الداكنة الأنيقة
       doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 45, 'F'); 
       
       doc.setFont("Helvetica", "bold"); doc.setFontSize(24); doc.setTextColor(56, 189, 248); doc.text("AI DIGITAL TAILOR", 20, 20);
@@ -572,7 +613,6 @@ function generatePDF() {
       
       doc.setLineWidth(0.5); doc.setDrawColor(59, 130, 246); doc.line(20, 55, 190, 55);
       
-      // بيانات العميل والتاريخ بعد الإصلاح
       doc.setFont("Helvetica", "normal"); doc.setFontSize(12); doc.setTextColor(50, 50, 50);
       doc.text(`Customer Name: ${finalUserName}`, 20, 68); 
       doc.text(`Report Date: ${formattedDate}`, 20, 76);
@@ -580,28 +620,27 @@ function generatePDF() {
       let modeText = (selectedMode === 'height') ? `Reference Height Method (${userRealHeightCm} cm)` : "National ID Card Method (Dynamic OpenCV Scan)";
       doc.text(`System Calibration: ${modeText}`, 20, 84);
       
-      // تصميم حاوية المقاسات المستخرجة
-      doc.setFillColor(248, 250, 252); doc.rect(20, 95, 170, 120, 'F');
-      doc.setDrawColor(226, 232, 240); doc.rect(20, 95, 170, 120, 'D');
+      doc.setFillColor(248, 250, 252); doc.rect(20, 95, 170, 140, 'F');
+      doc.setDrawColor(226, 232, 240); doc.rect(20, 95, 170, 140, 'D');
       
-      doc.setFont("Helvetica", "bold"); doc.setFontSize(13); doc.setTextColor(15, 23, 42);
+      doc.setFont("Helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(15, 23, 42);
       
-      // عرض المقاسات مع المسميات العربية الصوتية لسهولة الفهم من التزيي والعملاء دون تداخل خطوط
-      doc.text(`1. Total Shoulder Width (Ard Al-Ketf):       ${finalShoulder} cm`, 30, 115); 
-      doc.text(`2. Sleeve Length (Tol Al-Kom):                ${finalArm} cm`, 30, 130);
-      doc.text(`3. Wrist Width (Ard Al-Eswarah):              ${finalWrist} cm`, 30, 145);
-      doc.text(`4. Belly Area Width (Ard Al-Batn):             ${finalBelly} cm`, 30, 160);
-      doc.text(`5. Hips Area Width (Ard Al-Ardaf):             ${finalHips} cm`, 30, 175);
-      doc.text(`6. Total Leg Length (Tol Al-Regl):             ${finalLeg} cm`, 30, 195);
+      doc.text(`1. Shoulder Width (Ard Al-Ketf):                     ${finalShoulder} cm`, 30, 115); 
+      doc.text(`2. Neck Width (Ard Al-Raqabah):                    ${finalNeck} cm`, 30, 128);
+      doc.text(`3. Armhole Depth (Hardat Al-Ibt):                  ${finalArmhole} cm`, 30, 141);
+      doc.text(`4. Sleeve Length (Tol Al-Zera'a):                    ${finalArm} cm`, 30, 154);
+      doc.text(`5. Chest Width (Ard Al-Sadr):                         ${finalChest} cm`, 30, 167);
+      doc.text(`6. Waist Width (Ard Al-Wast):                         ${finalBelly} cm`, 30, 180);
+      doc.text(`7. Hips Area Width (Ard Akbar Hajm):             ${finalHips} cm`, 30, 193);
+      doc.text(`8. Total Leg Length (Tol Al-Regl):                    ${finalLeg} cm`, 30, 206);
       
       doc.setFont("Helvetica", "italic"); doc.setFontSize(10); doc.setTextColor(100);
-      doc.text("This automated report details the extracted measurements using 3-Stage Smart Fusion Filters.", 20, 235);
+      doc.text("This automated report details the extracted measurements using 3-Stage Smart Fusion Filters.", 20, 250);
       
-      // خط نهاية التقرير والـ Footer المعدل باسمك
       doc.setLineWidth(0.4); doc.setDrawColor(203, 213, 225); doc.line(20, 265, 190, 265); 
       
       doc.setFont("Helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(16, 185, 129); 
-      doc.text("Powered by Eng Yara  ", 20, 275); // التعديل الجديد للحقوق
+      doc.text("Powered by Eng Yara  ", 20, 275); 
       
       doc.save(`AI_Tailor_Report_${finalUserName}.pdf`);
     }
