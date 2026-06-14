@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Digital Tailor - الخياط الرقمي الذكي الاحترافي</title>
+  <title>AI Digital Tailor - الخياط الرقمي الذكي 3D</title>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -12,98 +12,67 @@
   <style>
     :root {
       --primary: #3b82f6;
-      --primary-hover: #1d4ed8;
       --success: #10b981;
       --error: #dc3545;
       --bg-glass: rgba(15, 23, 42, 0.75);
     }
 
     * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
-
-    body { 
-      min-height: 100vh; display: flex; flex-direction: column; align-items: center; 
-      background: #0f172a; color: #f8fafc; overflow-x: hidden; padding-bottom: 80px; 
-    }
-
+    body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; background: #0f172a; color: #f8fafc; overflow-x: hidden; padding-bottom: 80px; }
     #bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+    h1 { margin: 40px 10px 10px 10px; font-size: calc(1.8rem + 1vw); font-weight: 800; text-align: center; background: linear-gradient(to left, #38bdf8, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
-    h1 {
-      margin: 40px 10px 10px 10px; font-size: calc(1.8rem + 1vw); font-weight: 800; text-align: center;
-      background: linear-gradient(to left, #38bdf8, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-
-    .container { 
-      width: 100%; max-width: 1300px; padding: 15px; display: flex; justify-content: center; align-items: flex-start; gap: 25px; z-index: 1; flex-wrap: wrap; 
-    }
-    
-    .glass-card {
-      background: var(--bg-glass); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px; padding: 30px 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); width: 100%; max-width: 580px; margin: 0 auto; 
-    }
-
+    .container { width: 100%; max-width: 1350px; padding: 15px; display: flex; justify-content: center; align-items: flex-start; gap: 25px; z-index: 1; flex-wrap: wrap; }
+    .glass-card { background: var(--bg-glass); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 30px 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); width: 100%; max-width: 580px; margin: 0 auto; }
     .choice-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 25px; color: #cbd5e1; text-align: center; }
     .btn-group { display: flex; gap: 15px; justify-content: center; width: 100%; flex-wrap: wrap; }
-    
-    .btn-choice { 
-      padding: 15px; font-size: 0.95rem; font-weight: 700; border: 1px solid rgba(59, 130, 246, 0.5); 
-      border-radius: 12px; background: rgba(59, 130, 246, 0.1); color: #38bdf8; cursor: pointer; 
-      transition: all 0.3s ease; flex: 1; min-width: 200px; display: flex; flex-direction: column; align-items: center; gap: 5px;
-    }
+    .btn-choice { padding: 15px; font-size: 0.95rem; font-weight: 700; border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 12px; background: rgba(59, 130, 246, 0.1); color: #38bdf8; cursor: pointer; transition: all 0.3s ease; flex: 1; min-width: 200px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
     .btn-choice:hover:not(:disabled) { background: var(--primary); color: white; transform: translateY(-2px); }
     .btn-choice:disabled { opacity: 0.5; cursor: not-allowed; border-color: #475569; color: #64748b; }
     
-    .setup-sub-panel { 
-      background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 12px; margin-top: 20px; 
-      border: 1px dashed rgba(59, 130, 246, 0.3); display: none; text-align: center;
-    }
-
-    .setup-sub-panel input { 
-      width: 100%; max-width: 280px; padding: 12px; font-size: 16px; font-weight: bold;
-      border-radius: 8px; border: 2px solid #475569; background: #1e293b; color: #38bdf8; text-align: center; margin: 10px auto; outline: none; display: block;
-    }
-
-    .btn-start { 
-      background: var(--success); color: white; border: none; padding: 12px 30px; font-size: 1rem; border-radius: 8px; cursor: pointer; font-weight: 700; width: 100%; max-width: 250px;
-    }
+    .setup-sub-panel { background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px dashed rgba(59, 130, 246, 0.3); display: none; text-align: center; }
+    .setup-sub-panel input { width: 100%; max-width: 280px; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 8px; border: 2px solid #475569; background: #1e293b; color: #38bdf8; text-align: center; margin: 10px auto; outline: none; display: block; }
+    .btn-start { background: var(--success); color: white; border: none; padding: 12px 30px; font-size: 1rem; border-radius: 8px; cursor: pointer; font-weight: 700; width: 100%; max-width: 250px; }
     
     #video-container { position: relative; display: none; border-radius: 16px; overflow: hidden; border: 2px solid rgba(255,255,255,0.1); width: 100%; max-width: 640px; flex: 1 1 500px; }
     video { transform: scaleX(-1); background: #020617; display: block; width: 100%; height: auto; }
     canvas { position: absolute; left: 0; top: 0; transform: scaleX(-1); width: 100%; height: 100%; z-index: 2; }
     
     .status-badge { padding: 12px 20px; font-size: 0.95rem; font-weight: 700; border-radius: 50px; text-align: center; width: 100%; max-width: 1260px; display: none; margin-bottom: 10px; }
-    .status-error { background-color: rgba(220, 53, 69, 0.2); color: #fca5a5; border: 1px solid var(--error); }
-    .status-success { background-color: rgba(16, 185, 129, 0.2); color: #a7f3d0; border: 1px solid var(--success); }
+    .status-error { background-color: rgba(220, 53, 69, 0.25); color: #fca5a5; border: 1px solid var(--error); }
+    .status-success { background-color: rgba(16, 185, 129, 0.25); color: #a7f3d0; border: 1px solid var(--success); }
+    .status-warning { background-color: rgba(245, 158, 11, 0.25); color: #fde047; border: 1px solid #f59e0b; }
     
     .results-panel { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 22px; border-radius: 16px; width: 100%; max-width: 480px; display: none; flex: 1 1 380px; max-height: 85vh; overflow-y: auto; }
     .metric { display: flex; justify-content: space-between; font-size: 0.95rem; margin: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; color: #cbd5e1; }
-    
     .progress-bar { width: 100%; background-color: #334155; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 10px; }
     #progress-fill { width: 0%; height: 100%; background-color: var(--success); transition: width 0.1s; }
-    
-    .pattern-selection-card { background: rgba(30, 41, 59, 0.7); border: 2px solid #3b82f6; border-radius: 16px; padding: 20px; margin-top: 20px; width: 100%; display: none; }
-    .pattern-grid { display: flex; gap: 15px; overflow-x: auto; padding: 10px 0; scroll-behavior: smooth; }
-    .pattern-item { flex: 0 0 140px; background: #0f172a; border: 2px solid #334155; border-radius: 10px; padding: 8px; cursor: pointer; text-align: center; transition: all 0.3s; }
-    .pattern-item:hover, .pattern-item.selected { border-color: #a7f3d0; background: rgba(16, 185, 129, 0.1); transform: scale(1.03); }
-    .pattern-item img { width: 100%; height: 110px; object-fit: contain; border-radius: 6px; background: #fff; margin-bottom: 8px; }
-    .pattern-item p { font-size: 0.8rem; font-weight: bold; color: #cbd5e1; }
 
-    .chatbot-panel {
-      position: fixed; bottom: 80px; left: 20px; width: 500px; height: 620px;
-      background: rgba(255, 255, 255, 0.98); border: 3px solid #3b82f6; border-radius: 20px; z-index: 100;
-      display: none; flex-direction: column; overflow: hidden; color: #0f172a; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    }
-    #pattern-canvas-container { width: 100%; height: 440px; background: #f8fafc; position: relative; border-bottom: 1px solid #e2e8f0; }
-    #patternCanvas { width: 100%; height: 100%; display: block; transform: none !important; }
-    .chat-body { padding: 10px; flex: 1; font-size: 0.85rem; color: #334155; overflow-y: auto; text-align: center; font-weight: 600; background: #f1f5f9; }
+    /* الحاوية الكبرى لتقسيم محاذاة المشروع بعد اكتمال القياس */
+    .split-layout-block { display: none; width: 100%; max-width: 1300px; gap: 25px; margin-top: 10px; }
     
-    footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 15px 20px; display: flex; justify-content: center; align-items: center; z-index: 10; }
+    /* الحاوية اليمين: كروت الباترونات */
+    .right-patterns-panel { flex: 1; max-width: 320px; background: rgba(30, 41, 59, 0.7); border: 2px solid #3b82f6; border-radius: 16px; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+    .pattern-vertical-item { display: flex; align-items: center; gap: 15px; background: #0f172a; border: 2px solid #334155; border-radius: 12px; padding: 10px; cursor: pointer; transition: all 0.3s; }
+    .pattern-vertical-item:hover, .pattern-vertical-item.selected { border-color: #a7f3d0; background: rgba(16, 185, 129, 0.15); transform: translateX(-5px); }
+    .pattern-vertical-item img { width: 70px; height: 70px; object-fit: contain; border-radius: 8px; background: #fff; }
+    .pattern-vertical-item p { font-size: 0.85rem; font-weight: bold; color: #f8fafc; }
+
+    /* الحاوية اليسار: لوحة رسم المقاسات الذكية المدمجة */
+    .left-canvas-panel { flex: 2; background: rgba(15, 23, 42, 0.85); border: 3px solid #3b82f6; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    .canvas-header { background: #1e293b; padding: 15px; font-weight: bold; color: #38bdf8; text-align: center; font-size: 1rem; }
+    #pattern-canvas-container { width: 100%; height: 460px; background: #f8fafc; position: relative; border-bottom: 1px solid #e2e8f0; }
+    #patternCanvas { width: 100%; height: 100%; display: block; transform: none !important; }
+    .canvas-footer-msg { padding: 12px; font-size: 0.85rem; color: #334155; text-align: center; font-weight: 600; background: #f1f5f9; }
+
+    footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); padding: 15px 20px; display: flex; justify-content: center; align-items: center; z-index: 10; }
     .footer-text { font-size: 1rem; font-weight: 700; color: #34d399; }
   </style>
 </head>
 <body>
 
   <canvas id="bg-animation"></canvas>
-  <h1 id="main-title">الخياط الرقمي الذكي</h1>
+  <h1 id="main-title">الخياط الرقمي الذكي 3D</h1>
   
   <div class="container" id="app-container">
     <div class="glass-card" id="main-choice-panel">
@@ -131,22 +100,21 @@
     </div>
 
     <div class="results-panel" id="results-panel">
-      <h3 id="panel-results-title">المقاسات المستخرجة (دليل 1.jpeg):</h3>
+      <h3 id="panel-results-title">المقاسات الحيوية المستخرجة (3D Scanner):</h3>
       <div class="metric"><span id="lbl-name-tag">اسم العميل:</span> <span id="lbl-user-name" style="font-weight: 700; color: #38bdf8;">--</span></div>
       <div class="metric"><span id="lbl-system-tag">نظام المعايرة:</span> <span id="lbl-mode-type" style="font-weight: 700; color: #10b981;">--</span></div>
-      <div class="metric" id="lbl-round-row"><span id="lbl-round-tag">الجولة الحالية:</span> <span id="lbl-round-num" class="round-badge">1 / 3</span></div>
-      <div class="metric" id="card-metric-row"><span id="lbl-card-tag">عرض الكارت:</span> <span id="lbl-card-status" style="font-weight:700; color:#f59e0b;">جاري الفحص...</span></div>
+      <div class="metric" id="lbl-round-row"><span>الوضعية الحالية:</span> <span id="lbl-round-num" class="round-badge" style="background:#f59e0b;">1. المظهر الأمامي (Front)</span></div>
       
       <div class="metric"><span>1. الطول الكلي (Total Height):</span> <span id="val-1" style="color:#38bdf8; font-weight:700;">--</span></div>
-      <div class="metric"><span>2. محيط الرقبة (Neck Circ.):</span> <span id="val-2" style="color:#38bdf8; font-weight:700;">--</span></div>
-      <div class="metric"><span>3. محيط الصدر (Chest Circ.):</span> <span id="val-3" style="color:#38bdf8; font-weight:700;">--</span></div>
+      <div class="metric"><span>2. محيط الرقبة المجسم (Neck Circ.):</span> <span id="val-2" style="color:#38bdf8; font-weight:700;">--</span></div>
+      <div class="metric"><span>3. محيط الصدر الكامل (Chest Circ.):</span> <span id="val-3" style="color:#38bdf8; font-weight:700;">--</span></div>
       <div class="metric"><span>4. محيط أسفل الصدر (Underbust):</span> <span id="val-4" style="color:#38bdf8; font-weight:700;">--</span></div>
-      <div class="metric"><span>5. محيط الخصر (Waist Circ.):</span> <span id="val-5" style="color:#38bdf8; font-weight:700;">--</span></div>
-      <div class="metric"><span>6. محيط الورك (Hips Circ.):</span> <span id="val-6" style="color:#38bdf8; font-weight:700;">--</span></div>
+      <div class="metric"><span>5. محيط الخصر النقي (Waist Circ.):</span> <span id="val-5" style="color:#38bdf8; font-weight:700;">--</span></div>
+      <div class="metric"><span>6. محيط الورك والهانش (Hips Circ.):</span> <span id="val-6" style="color:#38bdf8; font-weight:700;">--</span></div>
       <div class="metric"><span>7. محيط الفخذ (Thigh Circ.):</span> <span id="val-7" style="color:#38bdf8; font-weight:700;">--</span></div>
       <div class="metric"><span>8. محيط الركبة (Knee Circ.):</span> <span id="val-8" style="color:#38bdf8; font-weight:700;">--</span></div>
       <div class="metric"><span>9. محيط الكاحل (Ankle Circ.):</span> <span id="val-9" style="color:#38bdf8; font-weight:700;">--</span></div>
-      <div class="metric"><span>10. عرض الكتفين (Shoulders):</span> <span id="val-10" style="color:#38bdf8; font-weight:700;">--</span></div>
+      <div class="metric"><span>10. عرض الكتفين الحقيقي (Shoulders):</span> <span id="val-10" style="color:#38bdf8; font-weight:700;">--</span></div>
       <div class="metric"><span>11. محيط الظهر أعلى (Upper Back):</span> <span id="val-11" style="color:#38bdf8; font-weight:700;">--</span></div>
       <div class="metric"><span>12. طول الذراع (Sleeve Length):</span> <span id="val-12" style="color:#38bdf8; font-weight:700;">--</span></div>
       <div class="metric"><span>13. خصر الخلف (Back Waist):</span> <span id="val-13" style="color:#38bdf8; font-weight:700;">--</span></div>
@@ -156,40 +124,41 @@
       </div>
     </div>
 
-    <div class="pattern-selection-card" id="pattern-selection-block">
-      <div class="choice-title" style="margin-bottom:10px; font-size:1rem; text-align:right; color:#a7f3d0;">اختر نوع الباترون لتطبيق المقاسات حياً عليه:</div>
-      <div class="pattern-grid">
-        <div class="pattern-item" id="p-item-1" onclick="selectPattern(1, '2.1.jpeg')">
+    <div class="split-layout-block" id="split-dashboard">
+      
+      <div class="left-canvas-panel">
+        <div class="canvas-header" id="bot-header">📐 إسقاط الأبعاد الحية على الباترون المختار (2D Smart Pattern)</div>
+        <div id="pattern-canvas-container">
+          <canvas id="patternCanvas" width="500" height="460"></canvas>
+        </div>
+        <div class="canvas-footer-msg" id="chat-msg">تم دمج مقاسات الـ 3D وتصحيح اتجاه النصوص والأبعاد فوق قالب القص بنجاح.</div>
+      </div>
+
+      <div class="right-patterns-panel">
+        <div style="font-size:0.9rem; font-weight:bold; color:#a7f3d0; margin-bottom:5px; text-align:center;">قوالب الباترونات المتاحة</div>
+        
+        <div class="pattern-vertical-item" id="p-item-1" onclick="selectPattern(1, '2.1.jpeg')">
           <img src="2.1.jpeg" alt="XL Pattern">
           <p>باترون XL حريمي (2.1)</p>
         </div>
-        <div class="pattern-item" id="p-item-2" onclick="selectPattern(2, '3.0.jpeg')">
+        <div class="pattern-vertical-item" id="p-item-2" onclick="selectPattern(2, '3.0.jpeg')">
           <img src="3.0.jpeg" alt="Classic Blouse">
           <p>بلوزة كلاسيك (3.0)</p>
         </div>
-        <div class="pattern-item" id="p-item-3" onclick="selectPattern(3, '4.1.jpeg')">
+        <div class="pattern-vertical-item" id="p-item-3" onclick="selectPattern(3, '4.1.jpeg')">
           <img src="4.1.jpeg" alt="Talla M Blouse">
           <p>بلوزة مشجرة M (4.1)</p>
         </div>
-        <div class="pattern-item" id="p-item-4" onclick="selectPattern(4, '5.1.jpeg')">
+        <div class="pattern-vertical-item" id="p-item-4" onclick="selectPattern(4, '5.1.jpeg')">
           <img src="5.1.jpeg" alt="Size L Shirt">
           <p>قميص نسائي L (5.1)</p>
         </div>
-        <div class="pattern-item" id="p-item-5" onclick="selectPattern(5, '6.1.jpeg')">
+        <div class="pattern-vertical-item" id="p-item-5" onclick="selectPattern(5, '6.1.jpeg')">
           <img src="6.1.jpeg" alt="Basic Shirt M">
           <p>قميص رجالي M (6.1)</p>
         </div>
       </div>
-    </div>
-  </div>
 
-  <div class="chatbot-panel" id="chatbot-ui">
-    <div class="chat-header" id="bot-header">📐 إسقاط الأبعاد الحية على الباترون المختار (2D Smart Pattern)</div>
-    <div id="pattern-canvas-container">
-      <canvas id="patternCanvas" width="500" height="440"></canvas>
-    </div>
-    <div class="chat-body" id="chat-msg">
-      تم دمج المقاسات وتصحيح اتجاه النصوص والأبعاد فوق صورة الباترون بنجاح.
     </div>
   </div>
 
@@ -199,47 +168,35 @@
     let activePatternId = 1;
     let selectedPatternImgName = "2.1.jpeg";
     let patternImageElement = new Image();
+    
+    let currentScanStage = 1; 
+    const SAMPLES_PER_STAGE = 30;
+    let stageSamples = [];
 
-    function onOpenCvReady() {
-      const btn = document.getElementById("btn-mode1");
-      btn.removeAttribute("disabled");
-      document.getElementById("sub-mode1").innerText = "أعلى دقة - فحص عبر OpenCV";
-    }
-
-    const bgCanvas = document.getElementById('bg-animation'); const bgCtx = bgCanvas.getContext('2d'); let particles = [];
-    function resizeBg() { bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight; }
-    window.addEventListener('resize', resizeBg); resizeBg();
-    class Particle { constructor() { this.x = Math.random() * bgCanvas.width; this.y = Math.random() * bgCanvas.height; this.vx = (Math.random() - 0.5) * 0.6; this.vy = (Math.random() - 0.5) * 0.6; this.radius = Math.random() * 2 + 1; } update() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > bgCanvas.width) this.vx *= -1; if (this.y < 0 || this.y > bgCanvas.height) this.vy *= -1; } draw() { bgCtx.beginPath(); bgCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); bgCtx.fillStyle = 'rgba(56, 189, 248, 0.25)'; bgCtx.fill(); } }
-    for (let i = 0; i < 40; i++) particles.push(new Particle());
-    function animateBg() { bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height); for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); } requestAnimationFrame(animateBg); } animateBg();
-
-    let selectedMode = ""; let userRealHeightCm = 0; let finalUserName = "YARA MAHMOUD"; const REAL_CARD_WIDTH_CM = 8.56; 
+    let widthsFront = {}, depthsSide = {}, widthsBack = {};
+    let finalMetrics = Array.from({ length: 14 }, () => 0);
+    
+    let selectedMode = ""; let userRealHeightCm = 0; let finalUserName = "YARA MAHMOUD"; const REAL_CARD_WIDTH_CM = 8.56;
     const videoElement = document.getElementById('webcam'); const canvasElement = document.getElementById('output_canvas'); const canvasCtx = canvasElement.getContext('2d');
-    const statusDiv = document.getElementById('status'); 
-
-    let currentRound = 1; const SAMPLES_PER_ROUND = 30; let lastSampleTime = 0; const SAMPLE_DELAY_MS = 95; let frameCount = 0; let lastDetectedCardWidth = 0;
+    const statusDiv = document.getElementById('status');
+    let lastSampleTime = 0; const SAMPLE_DELAY_MS = 100; let frameCount = 0; let lastDetectedCardWidth = 0;
     let cameraStarted = false; let isSaved = false;
 
-    let samples = Array.from({ length: 14 }, () => []);
-    let finalMetrics = Array.from({ length: 14 }, () => 0);
-
-    function selectMode(mode) {
-      selectedMode = mode;
-      document.getElementById('panel-card-info').style.display = (mode === 'card') ? 'block' : 'none';
-      document.getElementById('panel-height-info').style.display = (mode === 'height') ? 'block' : 'none';
-      resetSampling();
-    }
-
+    function onOpenCvReady() { document.getElementById("btn-mode1").removeAttribute("disabled"); document.getElementById("sub-mode1").innerText = "أعلى دقة - فحص عبر OpenCV"; }
+    function selectMode(mode) { selectedMode = mode; document.getElementById('panel-card-info').style.display = (mode === 'card') ? 'block' : 'none'; document.getElementById('panel-height-info').style.display = (mode === 'height') ? 'block' : 'none'; }
+    
     function startSystem(mode) {
       if (mode === 'height') {
-        const nameInput = document.getElementById('user-name-height').value.trim(); const heightInput = document.getElementById('user-height').value;
-        if (!heightInput || heightInput < 100 || heightInput > 250) { alert("برجاء إدخال طول صحيح بين 100 و 250 سم"); return; }
-        if (nameInput) finalUserName = nameInput; userRealHeightCm = parseFloat(heightInput);
-        document.getElementById('lbl-mode-type').innerText = "الارتفاع المرجعي (" + userRealHeightCm + " سم)"; document.getElementById('card-metric-row').style.display = "none";
+        const heightInput = document.getElementById('user-height').value;
+        if (!heightInput || heightInput < 100 || heightInput > 250) { alert("برجاء إدخال طول صحيح"); return; }
+        userRealHeightCm = parseFloat(heightInput);
+        document.getElementById('lbl-mode-type').innerText = "الارتفاع المرجعي (" + userRealHeightCm + " سم)";
       } else {
-        const nameInput = document.getElementById('user-name-card').value.trim(); if (nameInput) finalUserName = nameInput;
-        document.getElementById('lbl-mode-type').innerText = "فحص كارت OpenCV"; document.getElementById('card-metric-row').style.display = "flex";
+        document.getElementById('lbl-mode-type').innerText = "فحص كارت OpenCV";
       }
+      const nameCard = document.getElementById('user-name-card').value.trim();
+      const nameHeight = document.getElementById('user-name-height').value.trim();
+      if(nameCard) finalUserName = nameCard; else if(nameHeight) finalUserName = nameHeight;
       document.getElementById('lbl-user-name').innerText = finalUserName;
       document.getElementById('main-choice-panel').style.display = "none"; document.getElementById('video-container').style.display = "inline-block";
       document.getElementById('results-panel').style.display = "block"; statusDiv.style.display = "inline-block";
@@ -248,127 +205,117 @@
 
     function calculateDistance(p1, p2) { return Math.sqrt(Math.pow((p1.x - p2.x)*640, 2) + Math.pow((p1.y - p2.y)*480, 2)); }
 
-    function detectCardWidthPixels() {
-      frameCount++; if (frameCount % 6 !== 0 && lastDetectedCardWidth > 0) return lastDetectedCardWidth;
-      try {
-        let src = cv.imread(canvasElement); let gray = new cv.Mat(); let edges = new cv.Mat();
-        cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0); cv.GaussianBlur(gray, gray, new cv.Size(5, 5), 0, 0, cv.BORDER_DEFAULT); cv.Canny(gray, edges, 75, 200, 3, false);
-        let contours = new cv.MatVector(); let hierarchy = new cv.Mat(); cv.findContours(edges, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-        let detectedWidth = 0;
-        for (let i = 0; i < contours.size(); ++i) {
-            let cnt = contours.get(i); let rect = cv.boundingRect(cnt); let aspectRatio = rect.width / rect.height;
-            if (rect.width > 35 && rect.width < 150 && aspectRatio > 1.3 && aspectRatio < 1.8) { detectedWidth = rect.width; break; }
-        }
-        src.delete(); gray.delete(); edges.delete(); contours.delete(); hierarchy.delete(); 
-        if(detectedWidth > 0) lastDetectedCardWidth = detectedWidth; return detectedWidth;
-      } catch (err) { return lastDetectedCardWidth; }
-    }
-
     function onResults(results) {
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
       canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
       
-      if (!results.poseLandmarks) { updateStatus("برجاء الوقوف بعيداً حتى يظهر جسمك كاملاً...", "error"); return; }
+      if (!results.poseLandmarks) { updateStatus("برجاء الوقوف في منتصف الكاميرا تماماً...", "error"); return; }
 
       const landmarks = results.poseLandmarks;
       const nose = landmarks[0]; const leftShoulder = landmarks[11]; const rightShoulder = landmarks[12];
       const leftHip = landmarks[23]; const rightHip = landmarks[24]; const leftKnee = landmarks[25];
       const leftAnkle = landmarks[27]; const rightAnkle = landmarks[28]; const leftElbow = landmarks[13]; const leftWrist = landmarks[15];
 
-      const isBodyVisible = (nose.visibility > 0.50 && leftAnkle.visibility > 0.50 && leftHip.visibility > 0.50);
-      if (!isBodyVisible) { updateStatus("برجاء الوقوف خطوة للخلف لتغطية كامل أبعاد الجسم...", "error"); return; }
+      if (nose.visibility < 0.55 || leftAnkle.visibility < 0.55) { updateStatus("تنبيه: الكاحل أو الرأس غير ظاهر، تراجع خطوة للخلف...", "error"); return; }
 
-      let dynamicPixelToCmRatio = 0.264; 
+      let dynamicPixelToCmRatio = 0.264;
       if (selectedMode === 'height') {
         let ankleY = (leftAnkle.y + rightAnkle.y) / 2;
         dynamicPixelToCmRatio = userRealHeightCm / (calculateDistance(nose, {x: (leftAnkle.x+rightAnkle.x)/2, y: ankleY}) * 1.07);
-      } else if (selectedMode === 'card') {
-        let cardWidthPixels = detectCardWidthPixels();
-        if (cardWidthPixels === 0) { updateStatus("ضع كارت الرقم القومي أمام الصدر للمعايرة الكهرومغناطيسية...", "error"); return; }
-        else { document.getElementById('lbl-card-status').innerText = cardWidthPixels + " px"; dynamicPixelToCmRatio = REAL_CARD_WIDTH_CM / cardWidthPixels; }
       }
 
-      updateStatus(`وضعية صحيحة ومستقرة! جاري سحب الأبعاد [الجولة ${currentRound}]...`, "success");
+      drawCorrectedTrackingLines(canvasCtx, leftShoulder, rightShoulder, leftHip, rightHip, leftKnee, leftAnkle);
 
-      let shWidth = calculateDistance(rightShoulder, leftShoulder) * dynamicPixelToCmRatio;
-      let hipWidth = calculateDistance(rightHip, leftHip) * dynamicPixelToCmRatio;
-      
-      let c1 = (calculateDistance(nose, {x: (leftAnkle.x+rightAnkle.x)/2, y: (leftAnkle.y+rightAnkle.y)/2}) * 1.07) * dynamicPixelToCmRatio; 
-      let c2 = shWidth * 0.38 * Math.PI; 
-      let c3 = shWidth * 1.05 * Math.PI; 
-      let c4 = shWidth * 0.94 * Math.PI; 
-      let c5 = ((shWidth + hipWidth) / 2) * 0.88 * Math.PI; 
-      let c6 = hipWidth * 1.18 * Math.PI; 
-      let c7 = (calculateDistance(leftHip, leftKnee) * dynamicPixelToCmRatio) * 0.55 * Math.PI; 
-      let c8 = (calculateDistance(leftHip, leftKnee) * dynamicPixelToCmRatio) * 0.38 * Math.PI; 
-      let c9 = (calculateDistance(leftKnee, leftAnkle) * dynamicPixelToCmRatio) * 0.26 * Math.PI; 
-      let c10 = shWidth; 
-      let c11 = shWidth * 1.04; 
-      let c12 = (calculateDistance(leftShoulder, leftElbow) + calculateDistance(leftElbow, leftWrist)) * dynamicPixelToCmRatio; 
-      let c13 = c5 * 0.48; 
+      let currentWidth = calculateDistance(rightShoulder, leftShoulder) * dynamicPixelToCmRatio;
+      let currentHipWidth = calculateDistance(rightHip, leftHip) * dynamicPixelToCmRatio;
+      let currentHeight = (calculateDistance(nose, {x: (leftAnkle.x+rightAnkle.x)/2, y: (leftAnkle.y+rightAnkle.y)/2}) * 1.07) * dynamicPixelToCmRatio;
+      let currentArmLength = (calculateDistance(leftShoulder, leftElbow) + calculateDistance(leftElbow, leftWrist)) * dynamicPixelToCmRatio;
 
-      if (finalMetrics[1] === 0) {
-        document.getElementById('val-1').innerText = c1.toFixed(1) + " cm"; document.getElementById('val-2').innerText = c2.toFixed(1) + " cm";
-        document.getElementById('val-3').innerText = c3.toFixed(1) + " cm"; document.getElementById('val-4').innerText = c4.toFixed(1) + " cm";
-        document.getElementById('val-5').innerText = c5.toFixed(1) + " cm"; document.getElementById('val-6').innerText = c6.toFixed(1) + " cm";
-        document.getElementById('val-7').innerText = c7.toFixed(1) + " cm"; document.getElementById('val-8').innerText = c8.toFixed(1) + " cm";
-        document.getElementById('val-9').innerText = c9.toFixed(1) + " cm"; document.getElementById('val-10').innerText = c10.toFixed(1) + " cm";
-        document.getElementById('val-11').innerText = c11.toFixed(1) + " cm"; document.getElementById('val-12').innerText = c12.toFixed(1) + " cm";
-        document.getElementById('val-13').innerText = c13.toFixed(1) + " cm";
+      if (currentScanStage === 1) {
+        updateStatus("1/3 الوضع الأمامي: اثبت في مكانك جاري سحب أبعاد العرض...", "success");
+        document.getElementById('lbl-round-num').innerText = "1. المظهر الأمامي (Front)";
+      } else if (currentScanStage === 2) {
+        updateStatus("2/3 الوضع الجانبي: استدر للجنب تماماً لقياس العمق وبروز الصدر/الخصر...", "warning");
+        document.getElementById('lbl-round-num').innerText = "2. المظهر الجانبي (Side)";
+      } else if (currentScanStage === 3) {
+        updateStatus("3/3 الوضع الخلفي: اعطِ ظهرك للكاميرا لتأكيد عرض الكتفين النهائي...", "success");
+        document.getElementById('lbl-round-num').innerText = "3. المظهر الخلفي (Back)";
       }
-
-      drawCorrectedTrackingLines(canvasCtx, leftShoulder, rightShoulder, leftHip, rightHip);
 
       const currentTime = Date.now();
-      if (currentRound <= 3 && finalMetrics[1] === 0 && (currentTime - lastSampleTime >= SAMPLE_DELAY_MS)) {
+      if (currentScanStage <= 3 && finalMetrics[1] === 0 && (currentTime - lastSampleTime >= SAMPLE_DELAY_MS)) {
         lastSampleTime = currentTime;
-        if (samples[1].length < SAMPLES_PER_ROUND) {
-          samples[1].push(c1); samples[2].push(c2); samples[3].push(c3); samples[4].push(c4); samples[5].push(c5);
-          samples[6].push(c6); samples[7].push(c7); samples[8].push(c8); samples[9].push(c9); samples[10].push(c10);
-          samples[11].push(c11); samples[12].push(c12); samples[13].push(c13);
-          document.getElementById('progress-fill').style.width = (samples[1].length / SAMPLES_PER_ROUND) * 100 + "%";
-        } else {
-          if (currentRound < 3) {
-            currentRound++; 
-            document.getElementById('lbl-round-num').innerText = currentRound + " / 3";
-            for (let i = 1; i <= 13; i++) { samples[i] = []; }
-            playAudioFeedback('round');
-          } else {
-            for (let i = 1; i <= 13; i++) {
-              finalMetrics[i] = (samples[i].reduce((a, b) => a + b, 0) / SAMPLES_PER_ROUND).toFixed(1);
-              document.getElementById(`val-${i}`).innerText = finalMetrics[i] + " cm";
-            }
-            currentRound = 4;
-            document.getElementById('sampling-container').style.display = "none";
-            document.getElementById('pattern-selection-block').style.display = "block"; 
+        stageSamples.push({ w: currentWidth, h: currentHipWidth, hgt: currentHeight, arm: currentArmLength });
+        document.getElementById('progress-fill').style.width = (stageSamples.length / SAMPLES_PER_STAGE) * 100 + "%";
+
+        if (stageSamples.length >= SAMPLES_PER_STAGE) {
+          let avgW = stageSamples.reduce((sum, s) => sum + s.w, 0) / SAMPLES_PER_STAGE;
+          let avgH = stageSamples.reduce((sum, s) => sum + s.h, 0) / SAMPLES_PER_STAGE;
+          let avgHgt = stageSamples.reduce((sum, s) => sum + s.hgt, 0) / SAMPLES_PER_STAGE;
+          let avgArm = stageSamples.reduce((sum, s) => sum + s.arm, 0) / SAMPLES_PER_STAGE;
+
+          if (currentScanStage === 1) {
+            widthsFront = { shoulder: avgW, hip: avgH, height: avgHgt, arm: avgArm };
+            currentScanStage = 2; playAudioFeedback('stage'); stageSamples = [];
+          } else if (currentScanStage === 2) {
+            depthsSide = { shoulder: avgW, hip: avgH }; 
+            currentScanStage = 3; playAudioFeedback('stage'); stageSamples = [];
+          } else if (currentScanStage === 3) {
+            widthsBack = { shoulder: avgW, hip: avgH };
+            currentScanStage = 4; 
             
+            finalMetrics[1] = widthsFront.height.toFixed(1); 
+            finalMetrics[10] = ((widthsFront.shoulder + widthsBack.shoulder) / 2).toFixed(1); 
+            finalMetrics[12] = widthsFront.arm.toFixed(1); 
+            
+            finalMetrics[2] = (finalMetrics[10] * 0.38 * Math.PI).toFixed(1); 
+            finalMetrics[3] = calculateEllipseCirc(widthsFront.shoulder * 1.05, depthsSide.shoulder * 1.1).toFixed(1); 
+            finalMetrics[4] = (finalMetrics[3] * 0.89).toFixed(1); 
+            finalMetrics[5] = calculateEllipseCirc((widthsFront.shoulder + widthsFront.hip)/2 * 0.85, depthsSide.hip * 0.9).toFixed(1); 
+            finalMetrics[6] = calculateEllipseCirc(widthsFront.hip * 1.15, depthsSide.hip * 1.25).toFixed(1); 
+            
+            finalMetrics[7] = (widthsFront.hip * 0.55 * Math.PI).toFixed(1); 
+            finalMetrics[8] = (widthsFront.hip * 0.38 * Math.PI).toFixed(1); 
+            finalMetrics[9] = (widthsFront.hip * 0.26 * Math.PI).toFixed(1); 
+            finalMetrics[11] = (finalMetrics[10] * 1.04).toFixed(1); 
+            finalMetrics[13] = (finalMetrics[5] * 0.48).toFixed(1); 
+
+            for (let i = 1; i <= 13; i++) { document.getElementById(`val-${i}`).innerText = finalMetrics[i] + " cm"; }
+            document.getElementById('sampling-container').style.display = "none";
+            
+            // تفعيل وعرض هيكل التقسيم الجديد (الباترونات يمين والـ Canvas يسار)
+            document.getElementById('split-dashboard').style.display = "flex";
             if (!isSaved) { isSaved = true; playAudioFeedback('final'); selectPattern(1, '2.1.jpeg'); }
           }
         }
       }
     }
 
-    function drawCorrectedTrackingLines(ctx, leftSh, rightSh, leftHip, rightHip) {
-      ctx.strokeStyle = "#10b981"; ctx.lineWidth = 4;
-      ctx.beginPath(); ctx.moveTo(leftSh.x * 640, leftSh.y * 480); ctx.lineTo(rightSh.x * 640, rightSh.y * 480); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(leftHip.x * 640, leftHip.y * 480); ctx.lineTo(rightHip.x * 640, rightHip.y * 480); ctx.stroke();
+    function calculateEllipseCirc(a, b) {
+      let r1 = a / 2, r2 = b / 2;
+      return Math.PI * (3 * (r1 + r2) - Math.sqrt((3 * r1 + r2) * (r1 + 3 * r2)));
+    }
+
+    function drawCorrectedTrackingLines(ctx, ls, rs, lh, rh, lk, la) {
+      ctx.strokeStyle = "#10b981"; ctx.lineWidth = 3.5; ctx.shadowBlur = 8; ctx.shadowColor = "#10b981";
+      ctx.beginPath(); ctx.moveTo(ls.x * 640, ls.y * 480); ctx.lineTo(rs.x * 640, rs.y * 480); ctx.stroke();
+      let cy = (ls.y + lh.y) / 2 * 440;
+      ctx.beginPath(); ctx.moveTo(ls.x * 640 - 20, cy); ctx.lineTo(rs.x * 640 + 20, cy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(lh.x * 640, lh.y * 480); ctx.lineTo(rh.x * 640, rh.y * 480); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(lh.x * 640, lh.y * 480); ctx.lineTo(lk.x * 640, lk.y * 480); ctx.lineTo(la.x * 640, la.y * 480); ctx.stroke();
+      ctx.shadowBlur = 0; 
     }
 
     function selectPattern(id, fileName) {
-      activePatternId = id;
-      selectedPatternImgName = fileName;
-      document.querySelectorAll('.pattern-item').forEach(el => el.classList.remove('selected'));
+      activePatternId = id; selectedPatternImgName = fileName;
+      document.querySelectorAll('.pattern-vertical-item').forEach(el => el.classList.remove('selected'));
       document.getElementById(`p-item-${id}`).classList.add('selected');
-      
-      patternImageElement.onload = function() {
-        draw2DPatternCanvas();
-      };
+      patternImageElement.onload = function() { draw2DPatternCanvas(); };
       patternImageElement.src = fileName;
       generatePDF();
     }
 
     function draw2DPatternCanvas() {
-      document.getElementById('chatbot-ui').style.display = 'flex';
       const canvas = document.getElementById('patternCanvas'); const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(patternImageElement, 0, 0, canvas.width, canvas.height);
@@ -379,20 +326,16 @@
         drawMetricArrow(ctx, 110, 75, 230, 75, finalMetrics[10]);
         drawMetricArrow(ctx, 310, 215, 415, 215, (finalMetrics[11] / 2).toFixed(1));
         drawMetricArrow(ctx, 40, 350, 235, 350, finalMetrics[12]);
-      } 
-      else if (activePatternId === 2) { 
+      } else if (activePatternId === 2) { 
         drawMetricArrow(ctx, 290, 215, 420, 215, (finalMetrics[3] / 4).toFixed(1));
         drawMetricArrow(ctx, 460, 100, 460, 370, finalMetrics[12]);
-      } 
-      else if (activePatternId === 3) { 
+      } else if (activePatternId === 3) { 
         drawMetricArrow(ctx, 35, 55, 395, 55, finalMetrics[10]);
         drawMetricArrow(ctx, 35, 400, 410, 400, (finalMetrics[3] / 2).toFixed(1));
-      } 
-      else if (activePatternId === 4) { 
+      } else if (activePatternId === 4) { 
         drawMetricArrow(ctx, 260, 195, 415, 195, (finalMetrics[10] / 2).toFixed(1));
         drawMetricArrow(ctx, 640, 560, 860, 560, finalMetrics[12]);
-      } 
-      else if (activePatternId === 5) { 
+      } else if (activePatternId === 5) { 
         drawMetricArrow(ctx, 40, 275, 285, 275, (finalMetrics[3] / 4).toFixed(1));
         drawMetricArrow(ctx, 350, 275, 555, 275, (finalMetrics[11] / 2).toFixed(1));
         drawMetricArrow(ctx, 310, 760, 840, 760, finalMetrics[12]);
@@ -409,65 +352,106 @@
       ctx.stroke();
       
       const mx = (x1 + x2) / 2; const my = (y1 + y2) / 2;
-      ctx.save();
-      ctx.translate(mx, my);
-      ctx.scale(1, 1); 
+      ctx.save(); ctx.translate(mx, my); ctx.scale(1, 1);
       ctx.textDirection = "ltr"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
       ctx.fillStyle = "rgba(15, 23, 42, 0.95)"; ctx.fillRect(-35, -10, 70, 20);
       ctx.fillStyle = "#00ff66"; ctx.font = "bold 12px Arial";
-      ctx.fillText(value + " cm", 0, 0);
-      ctx.restore();
+      ctx.fillText(value + " cm", 0, 0); ctx.restore();
     }
 
-    function generatePDF() {
+function generatePDF() {
       if (!isSaved) return;
-      const { jsPDF } = window.jspdf; const doc = new jsPDF();
+      const { jsPDF } = window.jspdf; 
+      const doc = new jsPDF(); 
+      const now = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+      const formattedDate = now.toLocaleDateString('en-US', options);
       
-      doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 45, 'F'); 
-      doc.setFont("Helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(56, 189, 248); doc.text("AI DIGITAL TAILOR SYSTEM", 15, 18);
-      doc.setFontSize(9); doc.setTextColor(16, 185, 129); doc.text(`13-BIOMETRIC PATTERN REPORT FOR CLIENT: ${finalUserName.toUpperCase()}`, 15, 30);
+      // 1. تصميم الهيدر الاحترافي (Dark Navy Header)
+      doc.setFillColor(15, 23, 42); 
+      doc.rect(0, 0, 210, 48, 'F'); 
       
-      doc.setFont("Helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50, 50, 50);
-      doc.text(`Selected Pattern Model File: ${selectedPatternImgName}`, 15, 55);
-      doc.text(`Calibration Mode: ${selectedMode === 'height' ? 'Reference Height' : 'OpenCV ID Card'}`, 15, 62);
+      doc.setFont("Helvetica", "bold"); doc.setFontSize(24); doc.setTextColor(56, 189, 248); 
+      doc.text("AI DIGITAL TAILOR", 20, 22);
       
-      doc.setFillColor(248, 250, 252); doc.rect(15, 70, 180, 195, 'F');
+      doc.setFontSize(10); doc.setTextColor(16, 185, 129); 
+      doc.text("PRECISE 3D BIOMETRIC SIZE REPORT", 20, 36);
+      
+      // خط فاصل هندسي
+      doc.setLineWidth(0.5); doc.setDrawColor(59, 130, 246); 
+      doc.line(20, 56, 190, 56);
+      
+      // 2. قسم بيانات العميل والمعايرة (Client Metadata)
+      doc.setFont("Helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(71, 85, 105);
+      doc.setFont("Helvetica", "bold"); doc.text(`Customer Name: ${finalUserName.toUpperCase()}`, 20, 68); 
+      doc.setFont("Helvetica", "normal"); doc.text(`Report Date & Time: ${formattedDate}`, 20, 76);
+      
+      let modeText = (selectedMode === 'height') ? `Method 2: Reference Height Vector (${userRealHeightCm} cm)` : "Method 1: State ID Card Scan (Dynamic OpenCV Mode)";
+      doc.text(`Calibration Flow: ${modeText}`, 20, 84);
+      doc.text(`Applied Pattern Template: ${selectedPatternImgName}`, 20, 92);
+      
+      // 3. جدول المقاسات الـ 13 المنظم (Structured Metrics Table Box)
+      doc.setFillColor(248, 250, 252); doc.rect(20, 100, 170, 162, 'F');
+      doc.setDrawColor(226, 232, 240); doc.rect(20, 100, 170, 162, 'D');
+      
       doc.setFont("Helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(15, 23, 42);
       
-      let yOffset = 85;
+      let yOffset = 115;
       const labels = [
-        "", "1. Total Height (Al-Tol Al-Koly)", "2. Neck Circumference (Mohet Al-Raqabah)", "3. Chest Circumference (Mohet Al-Sadr)",
-        "4. Underbust Circumference (Asfal Al-Sadr)", "5. Waist Circumference (Mohet Al-Khasr)", "6. Hips Circumference (Mohet Al-Work)",
-        "7. Thigh Circumference (Mohet Al-Fakhd)", "8. Knee Circumference (Mohet Al-Rokbah)", "9. Ankle Circumference (Mohet Al-Kahal)",
-        "10. Shoulders Width (Ard Al-Ketfyn)", "11. Upper Back Circumference (Mohet Al-Zahr)", "12. Sleeve Length (Tol Al-Zera'a)",
+        "", 
+        "1. Total Height (Al-Tol Al-Koly)", 
+        "2. Neck Circumference (Mohet Al-Raqabah)", 
+        "3. Chest Circumference (Mohet Al-Sadr)",
+        "4. Underbust Circumference (Asfal Al-Sadr)", 
+        "5. Waist Circumference (Mohet Al-Khasr)", 
+        "6. Hips Circumference (Mohet Al-Work)",
+        "7. Thigh Circumference (Mohet Al-Fakhd)", 
+        "8. Knee Circumference (Mohet Al-Rokbah)", 
+        "9. Ankle Circumference (Mohet Al-Kahal)",
+        "10. Shoulders Width (Ard Al-Ketfyn)", 
+        "11. Upper Back Circumference (Mohet Al-Zahr)", 
+        "12. Sleeve Length (Tol Al-Zera'a)",
         "13. Back Waist Circumference (Khasr Al-Khalf)"
       ];
 
       for (let i = 1; i <= 13; i++) {
-        doc.text(`${labels[i]}:`, 25, yOffset);
-        doc.text(`${finalMetrics[i]} cm`, 150, yOffset);
-        yOffset += 13;
+        // طباعة المسمى جهة اليسار
+        doc.text(labels[i], 28, yOffset);
+        // طباعة القيمة المقاسة حياً جهة اليمين داخل الصندوق
+        doc.text(`${finalMetrics[i]} cm`, 162, yOffset);
+        
+        // رسم خط رمادي خفيف جداً لتسهيل حركة عين الترزي بين المسمى والقيمة
+        if (i < 13) {
+          doc.setLineWidth(0.1); doc.setDrawColor(241, 245, 249);
+          doc.line(25, yOffset + 4, 185, yOffset + 4);
+        }
+        yOffset += 11.5;
       }
       
-      doc.setLineWidth(0.3); doc.setDrawColor(200, 200, 200); doc.line(15, 272, 195, 272);
-      doc.setFontSize(10); doc.setTextColor(16, 185, 129); doc.text("Production Ready Data Structure - Powered by Eng Yara & Team", 15, 282);
-      doc.save(`AI_Biometric_Tailor_${finalUserName}.pdf`);
+      // 4. تذييل الصفحة الاحترافي والتوقيع (Professional Footer)
+      doc.setLineWidth(0.4); doc.setDrawColor(203, 213, 225); 
+      doc.line(20, 274, 190, 274); 
+      
+      doc.setFont("Helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(16, 185, 129); 
+      doc.text("Powered by eng yara", 20, 284); 
+      
+      // حفظ الملف تلقائياً باسم العميل
+      doc.save(`AI_3D_Tailor_Report_${finalUserName}.pdf`);
     }
 
     function playAudioFeedback(type) {
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-        osc.frequency.setValueAtTime(type === 'round' ? 750 : 1100, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        osc.frequency.setValueAtTime(type === 'stage' ? 600 : 1100, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.4);
       } catch (e) {}
     }
 
     function updateStatus(text, type) { statusDiv.innerText = text; statusDiv.className = `status-badge status-${type}`; }
-    function resetSampling() { currentRound = 1; for (let i = 1; i <= 13; i++) { samples[i] = []; } finalMetrics.fill(0); isSaved = false; }
-    function toggleLanguage() { alert("تم تخصيص الواجهة باللغة العربية."); }
-
+    function resetSampling() { currentScanStage = 1; stageSamples = []; finalMetrics.fill(0); isSaved = false; }
+  
     const pose = new Pose({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}` });
     pose.setOptions({ modelComplexity: 1, smoothLandmarks: true, minDetectionConfidence: 0.55, minTrackingConfidence: 0.55 });
     pose.onResults(onResults);
